@@ -25,7 +25,6 @@ export default function SignIn() {
       <Box
         sx={{
           paddingTop: 10,
-          marginTop: "15vh",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

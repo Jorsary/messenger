@@ -13,9 +13,9 @@ const user: boolean = false;
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout/>}>
+      <Route element={<Layout/>}>
         <Route element={<PrivateOutlet isAuth={user} />}>
-          <Route path="profile" element={<Profile />}></Route>
+          <Route path="/" element={<Profile />}></Route>
         </Route>
         <Route path="signin" element={<SignIn />}></Route>
         <Route path="signup" element={<SignUp />}></Route>
