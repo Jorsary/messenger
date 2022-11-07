@@ -16,6 +16,7 @@ import { setUser } from "./store/userSlice";
 import { browserLocalPersistence, setPersistence } from "firebase/auth";
 import Logout from "./pages/Logout";
 import { doc, getDoc } from "firebase/firestore";
+import Settings from "./pages/Settings";
 
 export const darkTheme = createTheme({
   palette: {
@@ -54,6 +55,7 @@ function App() {
             <Route path="/" element={<Profile />}></Route>
             <Route path="/messenger" element={<Messenger />}></Route>
             <Route path="/logout" element={<Logout />}></Route>
+            <Route path="/settings" element={<Settings />}></Route>
           </Route>
           <Route path="signin" element={<SignIn />}></Route>
           <Route path="signup" element={<SignUp />}></Route>

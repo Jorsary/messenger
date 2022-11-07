@@ -1,9 +1,10 @@
-import {
-  Avatar, Typography
-} from "@mui/material";
+import { Avatar, Typography } from "@mui/material";
 import { Box, Container } from "@mui/system";
+import { useAppSelector } from "../hooks/redux-hooks";
 
 const Profile = () => {
+  const { currentUser } = useAppSelector((state) => state.user);
+
   return (
     <Container
       maxWidth="lg"
@@ -25,7 +26,9 @@ const Profile = () => {
             height: 250,
             mr: "2%",
           }}
-        ></Avatar>
+          alt={`${currentUser?.displayName}`}
+          src={`${currentUser?.photoURL}`}
+        />
         <Box
           sx={{
             py: 12,
@@ -45,7 +48,7 @@ const Profile = () => {
               textDecoration: "none",
             }}
           >
-            Nickname
+            {currentUser?.displayName}
           </Typography>
           <Typography
             variant="h6"
@@ -58,7 +61,7 @@ const Profile = () => {
               textDecoration: "none",
             }}
           >
-            Email@mail.ru
+            {currentUser?.email}
           </Typography>
         </Box>
       </Box>

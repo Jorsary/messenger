@@ -45,6 +45,8 @@ export default function SignIn() {
     handleLogin(data.email, data.password);
   };
 
+  
+
   if (currentUser) {
     return <Navigate to="/" />;
   }

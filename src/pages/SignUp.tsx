@@ -9,7 +9,7 @@ import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { doc, setDoc } from "firebase/firestore";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { useCreateUserWithEmailAndPassword, useUpdateProfile } from "react-firebase-hooks/auth";
 import { useForm } from "react-hook-form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase/firebase";
@@ -21,8 +21,9 @@ interface IAuthForm {
 }
 
 export default function SignUp() {
-  const [createUserWithEmailAndPassword, user, loading, error] =
+  const [createUserWithEmailAndPassword, user, loading] =
     useCreateUserWithEmailAndPassword(auth);
+  const [updateProfile, updating] = useUpdateProfile(auth);
   const { currentUser, loadingUser } = useAppSelector((state) => state.user);
 
   const handleRegister = async (
@@ -32,13 +33,14 @@ export default function SignUp() {
   ) => {
     try {
       await createUserWithEmailAndPassword(email, password);
-      const date = new Date().getTime();
-
+      
       if (auth.currentUser) {
+        await updateProfile({displayName})
         await setDoc(doc(db, "users", auth.currentUser.uid), {
           uid: auth.currentUser.uid,
           displayName,
           email,
+          photoURL:null
         });
         await setDoc(doc(db, "userChats", auth.currentUser.uid), {});
         push("/");

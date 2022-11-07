@@ -22,7 +22,7 @@ export interface IMessage {
   text: string;
 }
 // { message, user, enemyUser }: InfoMessage
-const Message = ({bool}:any) => {
+const Message = ({ message, user, enemyUser }: InfoMessage) => {
   return (
     <Card
       sx={{
@@ -33,7 +33,7 @@ const Message = ({bool}:any) => {
         px: 2,
         alignItems: "center",
         justifyContent:'flex-start',
-        ...(bool && {
+        ...(message.senderId === user?.uid && {
           flexDirection:'row-reverse'
           
         })
@@ -53,7 +53,7 @@ const Message = ({bool}:any) => {
         <Typography>15:15</Typography>
       </Box>
       <Typography>
-        Хелло
+        {message.text}
         {/* {message.img && <img src={message.img} alt="" />} */}
       </Typography>
     </Card>
