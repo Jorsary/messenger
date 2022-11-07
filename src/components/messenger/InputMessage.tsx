@@ -1,6 +1,7 @@
 import {
-  Box, Button, TextField
+  Box, Button, TextField,Typography
 } from "@mui/material";
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
 
 const InputMessage = () => {
   return (
@@ -30,7 +31,7 @@ const InputMessage = () => {
           name="message"
           autoFocus
         />
-        <Button>Отправить</Button>
+        <Button><SendRoundedIcon></SendRoundedIcon></Button>
       </Box>
     </Box>
   );

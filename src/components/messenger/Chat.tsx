@@ -1,5 +1,6 @@
 import { Avatar, Box, Typography, AppBar, Toolbar } from "@mui/material";
 import InputMessage from "./InputMessage";
+import Message from "./Message";
 
 const Chat = () => {
   return (
@@ -7,8 +8,6 @@ const Chat = () => {
       sx={{
         flexGrow: 1,
         padding: 1,
-        borderLeft: "1px solid",
-        borderColor: "primary.main",
         position: "relative",
       }}
     >
@@ -27,9 +26,26 @@ const Chat = () => {
       <Box
         sx={{
           padding: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          maxHeight: '55vh',
+          overflowY: 'auto',
+          scrollBehavior: 'smooth'
         }}
         position="relative"
-      ></Box>
+      >
+        <Message bool={true}/>
+        <Message bool={false}/>
+        <Message bool={true}/>
+        <Message bool={false}/>
+        <Message bool={true}/>
+        <Message bool={true}/>
+        <Message bool={true}/>
+        <Message bool={true}/>
+        
+
+      </Box>
       <InputMessage />
     </Box>
   );

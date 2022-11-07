@@ -16,7 +16,7 @@ interface NavigationProps {
 }
 
 const Navigation = ({ links }: NavigationProps) => {
-  const { user } = useAppSelector((state) => state.user);
+  const { currentUser } = useAppSelector((state) => state.user);
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -66,7 +66,7 @@ const Navigation = ({ links }: NavigationProps) => {
           }}
         >
           {links
-            .filter((page) => !page.auth || user)
+            .filter((page) => !page.auth || currentUser)
             .map((page) => (
               <MenuItem
                 key={page.title}
@@ -121,7 +121,7 @@ const Navigation = ({ links }: NavigationProps) => {
           messenger
         </Typography>
         {links
-          .filter((page) => !page.auth || user)
+          .filter((page) => !page.auth || currentUser)
           .map((page) => (
             <MenuItem
               key={page.title}

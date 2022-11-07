@@ -9,18 +9,51 @@ import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Navigate } from "react-router-dom";
+import { getAuth } from "firebase/auth";
+import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { Navigate, useNavigate } from "react-router-dom";
+import { app } from "../firebase/firebase";
+import { SubmitHandler, useForm } from "react-hook-form";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useAppSelector } from "../hooks/redux-hooks";
 
+interface IAuthForm {
+  email: string;
+  password: string;
+}
 
 export default function SignIn() {
-  const { user } = useAppSelector((state) => state.user);
-
-  const handleSubmit = (event: any) => {
-    console.log(event);
+  const {currentUser,loadingUser} = useAppSelector(state=>state.user)
+  const push = useNavigate();
+  const auth = getAuth(app);
+  const [signInWithEmailAndPassword, user, loading, error] =
+    useSignInWithEmailAndPassword(auth);
+  const handleLogin = (email: string, password: string) => {
+    signInWithEmailAndPassword(email, password);
   };
-  if (user) {
+
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    reset,
+  } = useForm<IAuthForm>({
+    mode: "all",
+  });
+
+  const onSubmit = (data: IAuthForm) => {
+    handleLogin(data.email, data.password);
+  };
+
+  if (currentUser) {
     return <Navigate to="/" />;
+  }
+  if (loading || loadingUser) {
+    return (
+      <Box sx={{ display: "flex", alignItems: "center",justifyContent:'center' }}>
+        <CircularProgress color="secondary" />
+      </Box>
+    );
   }
   return (
     <Container component="main" maxWidth="xs">
@@ -38,26 +71,51 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Вход
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit((data) => {
+            onSubmit(data);
+            reset();
+          })}
+          noValidate
+          sx={{ mt: 1 }}
+        >
           <TextField
             margin="normal"
             required
             fullWidth
             id="email"
-            label="Эл.Почта"
-            name="email"
+            label="Адрес эл. почты"
             autoComplete="email"
             autoFocus
+            {...register("email", {
+              required: "Поле не может быть пустым",
+              pattern: {
+                value:
+                  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
+                message: "Некорректный email",
+              },
+            })}
           />
           <TextField
             margin="normal"
             required
             fullWidth
-            name="password"
             label="Пароль"
             type="password"
             id="password"
             autoComplete="current-password"
+            {...register("password", {
+              required: "Поле не может быть пустым",
+              pattern: {
+                value: /[A-Za-z0-9]/g,
+                message: "Некорректный password",
+              },
+              minLength: {
+                value: 6,
+                message: `Минимальная длина 6 символов`,
+              },
+            })}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
@@ -78,7 +136,7 @@ export default function SignIn() {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link onClick={() => push("/signup")} variant="body2">
                 {"Нет аккаунта? Зарегистрироваться"}
               </Link>
             </Grid>
