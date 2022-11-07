@@ -1,9 +1,14 @@
-import React from 'react'
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useAppSelector } from "../hooks/redux-hooks";
 
 const SignUp = () => {
-  return (
-    <div>SignUp</div>
-  )
-}
+  const { user } = useAppSelector((state) => state.user);
 
-export default SignUp
+  if (user) {
+    return <Navigate to="/" />;
+  }
+  return <div>SignUp</div>;
+};
+
+export default SignUp;

@@ -1,20 +1,23 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { IconButton, Link } from "@mui/material";
+import { IconButton } from "@mui/material";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/system";
-import { NavLinks } from "../../models";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../hooks/redux-hooks";
+import { NavLinks } from "../../models";
 
 interface NavigationProps {
   links: NavLinks[];
 }
 
 const Navigation = ({ links }: NavigationProps) => {
+  const { user } = useAppSelector((state) => state.user);
+
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -62,42 +65,71 @@ const Navigation = ({ links }: NavigationProps) => {
             display: { xs: "block", md: "none" },
           }}
         >
-          {links.map((page) => (
-            <MenuItem key={page.title} onClick={() => handleFollowToLink(page.path)}>
-              <Typography textAlign="center">{page.title}</Typography>
-            </MenuItem>
-          ))}
+          {links
+            .filter((page) => !page.auth || user)
+            .map((page) => (
+              <MenuItem
+                key={page.title}
+                onClick={() => handleFollowToLink(page.path)}
+              >
+                <Typography textAlign="center">{page.title}</Typography>
+              </MenuItem>
+            ))}
         </Menu>
       </Box>
-      <SendRoundedIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
       <Typography
         variant="h5"
         noWrap
         component="a"
         href=""
         sx={{
-          mr:'-32px',
+          mr: "-32px",
           display: { xs: "flex", md: "none" },
           flexGrow: 1,
+          fontSize: 15,
           fontFamily: "monospace",
           fontWeight: 700,
-          letterSpacing: ".3rem",
+          letterSpacing: ".2rem",
           color: "inherit",
           textDecoration: "none",
         }}
       >
+        <SendRoundedIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
         messenger
       </Typography>
       <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-        {links.map((page) => (
-          <Button
-            onClick={() => handleFollowToLink(page.path)}
-            sx={{ my: 2, color: "white", display: "block" }}
-            href={page.path}
-          >
-            {page.title}
-          </Button>
-        ))}
+        <Typography
+          variant="h6"
+          noWrap
+          component="a"
+          onClick={() => push("/")}
+          sx={{
+            mr: 2,
+            display: { xs: "none", md: "flex" },
+            alignItems: "center",
+            fontFamily: "monospace",
+            fontWeight: 700,
+            letterSpacing: ".3rem",
+            color: "inherit",
+            textDecoration: "none",
+            cursor: "pointer",
+          }}
+        >
+          <SendRoundedIcon
+            sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
+          />
+          messenger
+        </Typography>
+        {links
+          .filter((page) => !page.auth || user)
+          .map((page) => (
+            <MenuItem
+              key={page.title}
+              onClick={() => handleFollowToLink(page.path)}
+            >
+              <Typography textAlign="center">{page.title}</Typography>
+            </MenuItem>
+          ))}
       </Box>
     </>
   );
