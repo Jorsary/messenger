@@ -31,7 +31,6 @@ const Chat = () => {
       console.log(err);
     }
   }, [chatId]);
-  console.log(enemyUser)
 
   useEffect(() => {
     if (chatRef.current) {
