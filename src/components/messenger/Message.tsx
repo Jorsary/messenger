@@ -23,8 +23,8 @@ export interface IMessage {
 }
 // { message, user, enemyUser }: InfoMessage
 const Message = ({ message, user, enemyUser }: InfoMessage) => {
-  return (
-    <Card
+
+   if(user && enemyUser){ return (<Card
       sx={{
         display: "flex",
         gap: "10px",
@@ -49,15 +49,21 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
           padding: 1,
         }}
       >
-        <Avatar />
-        <Typography>15:15</Typography>
+        <Avatar src={
+              message.senderId === enemyUser?.uid
+                ? `${enemyUser.photoURL}`
+                : `${user.photoURL}`
+            } />
+
+        <Typography>{new Date(message.date.seconds * 1000).toTimeString().split(" ")[0]}</Typography>
       </Box>
       <Typography>
         {message.text}
         {/* {message.img && <img src={message.img} alt="" />} */}
       </Typography>
-    </Card>
-  );
+    </Card>) }
+    return(<></>)
+  
 };
 
 export default Message;

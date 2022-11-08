@@ -53,7 +53,7 @@ const Chat = () => {
         }}
       >
         <Toolbar sx={{ display: "flex", gap: 1 }}>
-          <Avatar />
+          <Avatar src={`${enemyUser?.photoURL}`} />
           <Typography>{enemyUser?.displayName}</Typography>
         </Toolbar>
       </AppBar>
@@ -71,7 +71,12 @@ const Chat = () => {
         ref={chatRef}
       >
         {messages.map((m: IMessage) => (
-          <Message enemyUser={enemyUser} user={currentUser} key={m.id} message={m} />
+          <Message
+            enemyUser={enemyUser}
+            user={currentUser}
+            key={m.id}
+            message={m}
+          />
         ))}
       </Box>
       <InputMessage />

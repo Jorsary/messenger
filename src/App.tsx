@@ -1,22 +1,20 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import { browserLocalPersistence, setPersistence } from "firebase/auth";
+import { useEffect } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useDispatch } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import PrivateOutlet from "./components/PrivateOutlet";
+import { auth } from "./firebase/firebase";
 import { useAppSelector } from "./hooks/redux-hooks";
+import Logout from "./pages/Logout";
 import Messenger from "./pages/Messenger";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "./firebase/firebase";
-import { useDispatch } from "react-redux";
 import { setUser } from "./store/userSlice";
-import { browserLocalPersistence, setPersistence } from "firebase/auth";
-import Logout from "./pages/Logout";
-import { doc, getDoc } from "firebase/firestore";
-import Settings from "./pages/Settings";
 
 export const darkTheme = createTheme({
   palette: {
@@ -55,7 +53,6 @@ function App() {
             <Route path="/" element={<Profile />}></Route>
             <Route path="/messenger" element={<Messenger />}></Route>
             <Route path="/logout" element={<Logout />}></Route>
-            <Route path="/settings" element={<Settings />}></Route>
           </Route>
           <Route path="signin" element={<SignIn />}></Route>
           <Route path="signup" element={<SignUp />}></Route>

@@ -1,9 +1,22 @@
-import { Avatar, Typography } from "@mui/material";
+import { Avatar, Typography, Popover,Button } from "@mui/material";
 import { Box, Container } from "@mui/system";
+import { useState } from "react";
+import Modal from "../components/Modal";
 import { useAppSelector } from "../hooks/redux-hooks";
 
 const Profile = () => {
   const { currentUser } = useAppSelector((state) => state.user);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
 
   return (
     <Container
@@ -21,6 +34,8 @@ const Profile = () => {
         }}
       >
         <Avatar
+          aria-describedby={id}
+          onClick={(e)=>handleClick(e)}
           sx={{
             width: 250,
             height: 250,
@@ -29,6 +44,18 @@ const Profile = () => {
           alt={`${currentUser?.displayName}`}
           src={`${currentUser?.photoURL}`}
         />
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Modal />
+      </Popover>
         <Box
           sx={{
             py: 12,
