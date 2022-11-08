@@ -4,7 +4,7 @@ import {
   Button,
   Container,
   Input,
-  Typography
+  Typography,
 } from "@mui/material";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
@@ -38,22 +38,22 @@ const Modal = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-
   const handleChangeAvatar = async (e: any) => {
     e.preventDefault();
-    if(currentUser && currentUser.displayName && selectedFile){const date = new Date().getTime();
-    const storageRef = ref(storage, `${currentUser.displayName + date}`);
-    await uploadBytesResumable(storageRef, selectedFile);
-    const downloadURL = await getDownloadURL(storageRef);
-    await updateProfile(currentUser, {
-      displayName: currentUser.displayName,
-      photoURL: downloadURL,
-    });
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      photoURL: downloadURL,
-    });
-
-  }};
+    if (currentUser && currentUser.displayName && selectedFile) {
+      const date = new Date().getTime();
+      const storageRef = ref(storage, `${currentUser.displayName + date}`);
+      await uploadBytesResumable(storageRef, selectedFile);
+      const downloadURL = await getDownloadURL(storageRef);
+      await updateProfile(currentUser, {
+        displayName: currentUser.displayName,
+        photoURL: downloadURL,
+      });
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        photoURL: downloadURL,
+      });
+    }
+  };
   return (
     <Container component="main" maxWidth="xs">
       <Box

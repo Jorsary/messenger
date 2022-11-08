@@ -1,5 +1,6 @@
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { Box, Button, TextField, Input } from "@mui/material";
+import { Box, Button, Input, TextField } from "@mui/material";
 import {
   arrayUnion,
   doc,
@@ -8,11 +9,10 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import uuid from "react-uuid";
 import { db, storage } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
 
 const InputMessage = () => {
   const [text, setText] = useState("");
@@ -33,21 +33,16 @@ const InputMessage = () => {
     if (currentUser && enemyUser) {
       if (img) {
         const storageRef = ref(storage, uuid());
-
-        const uploadTask = uploadBytesResumable(storageRef, img);
-
-        uploadTask.on("state_changed", () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            await updateDoc(doc(db, "chats", chatId), {
-              messages: arrayUnion({
-                id: uuid(),
-                text,
-                senderId: currentUser.uid,
-                date: Timestamp.now(),
-                img: downloadURL,
-              }),
-            });
-          });
+        await uploadBytesResumable(storageRef, img);
+        const downloadURL = await getDownloadURL(storageRef);
+        await updateDoc(doc(db, "chats", chatId), {
+          messages: arrayUnion({
+            id: uuid(),
+            text,
+            senderId: currentUser.uid,
+            date: Timestamp.now(),
+            img: downloadURL,
+          }),
         });
       } else {
         await updateDoc(doc(db, "chats", chatId), {

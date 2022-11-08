@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
-import { DocumentData } from "firebase/firestore";
-import { UserInfo } from "../model";
 
 
 interface UserState {
