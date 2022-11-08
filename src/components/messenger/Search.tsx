@@ -1,21 +1,17 @@
+import { Avatar, Box, Card, TextField, Typography } from "@mui/material";
 import {
   collection,
   doc,
   getDoc,
-  getDocs,
-  onSnapshot,
-  query,
+  getDocs, query,
   serverTimestamp,
   setDoc,
   updateDoc,
-  where,
+  where
 } from "firebase/firestore";
-import { useAppSelector } from "../../hooks/redux-hooks";
 import { useState } from "react";
 import { db } from "../../firebase/firebase";
-import UserChat from "./UserChat";
-import { Avatar, Box, Card, Typography,TextField } from "@mui/material";
-
+import { useAppSelector } from "../../hooks/redux-hooks";
 
 const Search = () => {
   const [userAName, setUserAName] = useState("");
@@ -57,8 +53,7 @@ const Search = () => {
           await updateDoc(doc(db, "userChats", userAnother.uid), {
             [combinedId + ".userInfo"]: {
               uid: currentUser.uid,
-              displayName: currentUser.displayName,
-              photoURL: currentUser.photoURL,
+              userRef: doc(db,'users',currentUser.uid)
             },
             [combinedId + ".date"]: serverTimestamp(),
           });
@@ -66,8 +61,7 @@ const Search = () => {
           await updateDoc(doc(db, "userChats", currentUser.uid), {
             [combinedId + ".userInfo"]: {
               uid: userAnother.uid,
-              displayName: userAnother.displayName,
-              photoURL: userAnother.photoURL,
+              userRef: doc(db,'users',userAnother.uid)
             },
             [combinedId + ".date"]: serverTimestamp(),
           });

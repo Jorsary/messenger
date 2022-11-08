@@ -1,4 +1,7 @@
+import { async } from "@firebase/util";
 import { Avatar, Box, Card, Typography } from "@mui/material";
+import { getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { changeUser } from "../../store/chatSlice";
 
@@ -12,9 +15,20 @@ const UserChat = ({ info }: any) => {
       dispatch(changeUser({ u, res }));
     }
   };
+
+  const [userInfo,setUserInfo] = useState<any>({})
+  const asfnc = async ()=>{
+    const res:any = await getDoc(info.userInfo.userRef)
+    setUserInfo(res.data())
+
+  }
+  useEffect(() => {
+    asfnc()
+  }, [info])
+  
   return (
     <Card
-    onClick={() => handleSelectChat(info.userInfo)}
+    onClick={() => handleSelectChat(userInfo)}
       sx={{
         boxSizing: "border-box",
         minHeight: 64,
@@ -32,9 +46,9 @@ const UserChat = ({ info }: any) => {
         },
       }}
     >
-      <Avatar alt={info.userInfo.displayName}  src={info.userInfo.photoURL}/>
+      <Avatar alt={userInfo.displayName}  src={userInfo.photoURL}/>
       <Box>
-        <Typography variant="body1">{info.userInfo.displayName}</Typography>
+        <Typography variant="body1">{userInfo.displayName}</Typography>
         <Typography
           color="text.disabled"
           variant="body1"
