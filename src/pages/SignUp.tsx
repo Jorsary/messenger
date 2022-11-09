@@ -9,7 +9,10 @@ import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { doc, setDoc } from "firebase/firestore";
-import { useCreateUserWithEmailAndPassword, useUpdateProfile } from "react-firebase-hooks/auth";
+import {
+  useCreateUserWithEmailAndPassword,
+  useUpdateProfile,
+} from "react-firebase-hooks/auth";
 import { useForm } from "react-hook-form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase/firebase";
@@ -33,14 +36,14 @@ export default function SignUp() {
   ) => {
     try {
       await createUserWithEmailAndPassword(email, password);
-      
+
       if (auth.currentUser) {
-        await updateProfile({displayName})
+        await updateProfile({ displayName });
         await setDoc(doc(db, "users", auth.currentUser.uid), {
           uid: auth.currentUser.uid,
           displayName,
           email,
-          photoURL:null
+          photoURL: null,
         });
         await setDoc(doc(db, "userChats", auth.currentUser.uid), {});
         push("/");
