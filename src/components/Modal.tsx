@@ -18,6 +18,7 @@ const Modal = () => {
   const { currentUser } = useAppSelector((state) => state.user);
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
   const [preview, setPreview] = useState<undefined | string>();
+  
 
   useEffect(() => {
     if (!selectedFile) {

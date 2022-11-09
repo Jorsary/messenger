@@ -14,6 +14,29 @@ export interface IMessage {
   text: string;
 }
 
+function stringToColor(string: string) {
+  let hash = 0;
+  for (let i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = "#";
+
+  for (let i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  return color;
+}
+
+function stringAvatar(name: string) {
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+    },
+  };
+}
+
 const Chat = () => {
   const { chatId, enemyUser } = useAppSelector((state) => state.chat);
   const { currentUser } = useAppSelector((state) => state.user);
@@ -40,9 +63,10 @@ const Chat = () => {
   return (
     <Box
       sx={{
-        flexGrow: 1,
         padding: 1,
         position: "relative",
+        flex: "3",
+        height: "100%",
       }}
     >
       <AppBar
@@ -53,7 +77,11 @@ const Chat = () => {
         }}
       >
         <Toolbar sx={{ display: "flex", gap: 1 }}>
-          <Avatar src={`${enemyUser?.photoURL}`} />
+          <Avatar
+            {...stringAvatar(`${enemyUser?.displayName}`)}
+            src={`${enemyUser?.photoURL}`}
+            alt={`${enemyUser?.displayName}`}
+          />
           <Typography>{enemyUser?.displayName}</Typography>
         </Toolbar>
       </AppBar>
@@ -66,6 +94,7 @@ const Chat = () => {
           maxHeight: "55vh",
           overflowY: "auto",
           scrollBehavior: "smooth",
+          gap: 2,
         }}
         position="relative"
         ref={chatRef}

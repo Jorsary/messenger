@@ -43,6 +43,9 @@ const User = ({ settings }: UserProps) => {
             <Avatar
               alt={`${currentUser?.displayName}`}
               src={`${currentUser?.photoURL}`}
+              sx={{
+                background:'white'
+              }}
             />
           </IconButton>
         </Tooltip>

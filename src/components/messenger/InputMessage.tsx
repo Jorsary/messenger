@@ -9,7 +9,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useRef } from "react";
 import uuid from "react-uuid";
 import { db, storage } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
@@ -17,6 +17,7 @@ import { useAppSelector } from "../../hooks/redux-hooks";
 const InputMessage = () => {
   const [text, setText] = useState("");
   const [img, setImg] = useState<File | null>();
+  const imgRef = useRef<HTMLInputElement>(null);
 
   const { currentUser } = useAppSelector((state) => state.user);
   const { chatId, enemyUser } = useAppSelector((state) => state.chat);
@@ -27,6 +28,7 @@ const InputMessage = () => {
       return;
     }
     setImg(e.target.files[0]);
+
   };
 
   const handleSend = async () => {
@@ -71,6 +73,10 @@ const InputMessage = () => {
 
       setText("");
       setImg(null);
+      if (imgRef.current) {
+        imgRef.current.value=''
+        console.log(imgRef.current.files)
+      }
     }
   };
 
@@ -109,10 +115,11 @@ const InputMessage = () => {
           autoFocus
           value={text}
         />
-        <Input
-          style={{ display: "none" }}
+        <input
+          style={{display:'none'}}
           id="raised-button-file"
           type="file"
+          ref={imgRef}
           onChange={onSelectFile}
         />
         <label htmlFor="raised-button-file">

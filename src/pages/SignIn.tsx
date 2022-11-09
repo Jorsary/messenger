@@ -16,6 +16,7 @@ import { app } from "../firebase/firebase";
 import { SubmitHandler, useForm } from "react-hook-form";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useAppSelector } from "../hooks/redux-hooks";
+import Loader from "../components/Loader";
 
 interface IAuthForm {
   email: string;
@@ -52,9 +53,7 @@ export default function SignIn() {
   }
   if (loading || loadingUser) {
     return (
-      <Box sx={{ display: "flex", alignItems: "center",justifyContent:'center' }}>
-        <CircularProgress color="secondary" />
-      </Box>
+      <Loader />
     );
   }
   return (

@@ -29,11 +29,7 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
       <Box
         sx={{
           display: "flex",
-          gap: "10px",
-          mb: "20px",
-          minHeight: "80px",
           px: 2,
-          alignItems: "center",
           justifyContent: "flex-start",
           ...(message.senderId === user?.uid && {
             flexDirection: "row-reverse",
@@ -44,10 +40,10 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
             color: "gray",
             fontWeight: 300,
             padding: 1,
+            alignItems: "center",
           }}
         >
           <Avatar
@@ -56,23 +52,55 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
                 ? `${enemyUser.photoURL}`
                 : `${user.photoURL}`
             }
+            sx={{ background: "white" }}
           />
           <Typography variant="caption">
             {new Date(message.date.seconds * 1000).toTimeString().split(" ")[0]}
           </Typography>
         </Box>
-        <Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="body1" color={"primary.main"}>
+        <Card
+          sx={{
+            maxWidth: 400,
+            display: "flex",
+            flexDirection: "column",
+            padding: "11px",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              ...(message.senderId === user?.uid && {
+                justifyContent: "end",
+              }),
+            }}
+          >
+            <Typography
+              variant="body1"
+              color={"primary.main"}
+              sx={{
+                lineHeight: "15px",
+                fontStyle: "normal",
+                textAlign: "justify",
+              }}
+            >
               {message.senderId === enemyUser?.uid
                 ? `${enemyUser.displayName}`
                 : `${user.displayName}`}
             </Typography>
           </Box>
 
-          <Typography>{message.text}</Typography>
-        </Box>
-        {message.img && <img style={{ width: 100 }} src={message.img} alt="" />}
+          <Typography
+            sx={{
+              maxWidth: 400,
+              wordWrap: "break-word",
+            }}
+          >
+            {message.text}
+          </Typography>
+          {message.img && (
+            <img style={{ maxWidth: "300px",width:'100%' }} src={message.img} alt="" />
+          )}
+        </Card>
       </Box>
     );
   }

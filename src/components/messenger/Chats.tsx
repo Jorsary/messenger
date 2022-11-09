@@ -29,11 +29,7 @@ const Chats = () => {
     }
   }, [currentUser]);
 
-  // {
-  //   Object.entries(chats)
-  //     ?.sort((a: any, b: any) => b[1].date - a[1].date)
-  //     .map((chat: any) => console.log(chat));
-  // }
+
 
   return (
     <Box

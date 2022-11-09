@@ -40,7 +40,8 @@ const Profile = () => {
           sx={{
             width: 250,
             height: 250,
-            mr: "2%"
+            mr: "2%",
+            background:'white'
           }}
           alt={`${currentUser?.displayName}`}
           src={`${currentUser?.photoURL}`}

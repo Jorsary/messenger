@@ -11,24 +11,26 @@ const UserChat = ({ info }: any) => {
 
   const handleSelectChat = (u: any) => {
     if (currentUser) {
-      const res = currentUser.uid > u.uid ? currentUser.uid + u.uid : u.uid + currentUser.uid;
+      const res =
+        currentUser.uid > u.uid
+          ? currentUser.uid + u.uid
+          : u.uid + currentUser.uid;
       dispatch(changeUser({ u, res }));
     }
   };
 
-  const [userInfo,setUserInfo] = useState<any>({})
-  const asfnc = async ()=>{
-    const res:any = await getDoc(info.userInfo.userRef)
-    setUserInfo(res.data())
-
-  }
+  const [userInfo, setUserInfo] = useState<any>({});
+  const asfnc = async () => {
+    const res: any = await getDoc(info.userInfo.userRef);
+    setUserInfo(res.data());
+  };
   useEffect(() => {
-    asfnc()
-  }, [info])
-  
+    asfnc();
+  }, [info]);
+
   return (
     <Card
-    onClick={() => handleSelectChat(userInfo)}
+      onClick={() => handleSelectChat(userInfo)}
       sx={{
         boxSizing: "border-box",
         minHeight: 64,
@@ -46,7 +48,11 @@ const UserChat = ({ info }: any) => {
         },
       }}
     >
-      <Avatar alt={userInfo.displayName}  src={userInfo.photoURL}/>
+      <Avatar
+        alt={userInfo.displayName}
+        src={userInfo.photoURL}
+        sx={{ background: "white" }}
+      />
       <Box>
         <Typography variant="body1">{userInfo.displayName}</Typography>
         <Typography
