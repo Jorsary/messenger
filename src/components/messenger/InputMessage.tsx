@@ -121,7 +121,7 @@ const InputMessage = () => {
         />
         <label htmlFor="raised-button-file">
           <Button component="span">
-            <AttachFileIcon />
+            <AttachFileIcon/>
           </Button>
         </label>
         <Button type="submit">

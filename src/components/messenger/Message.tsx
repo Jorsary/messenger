@@ -24,10 +24,8 @@ export interface IMessage {
   img?: string;
 }
 
-
-
 const Message = ({ message, user, enemyUser }: InfoMessage) => {
-  const senderUser = message.senderId === enemyUser?.uid
+  const senderUser = message.senderId === enemyUser?.uid;
   if (user && enemyUser) {
     return (
       <Box
@@ -51,19 +49,13 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
           }}
         >
           <Avatar
-            src={
-              senderUser
-                ? `${enemyUser.photoURL}`
-                : `${user.photoURL}`
-            }
+            src={senderUser ? `${enemyUser.photoURL}` : `${user.photoURL}`}
             alt={
-              senderUser
-                ? `${enemyUser.displayName}`
-                : `${user.displayName}`}
+              senderUser ? `${enemyUser.displayName}` : `${user.displayName}`
+            }
             {...stringToColor(
-              senderUser
-                ? `${enemyUser.displayName}`
-                : `${user.displayName}`)}
+              senderUser ? `${enemyUser.displayName}` : `${user.displayName}`
+            )}
           />
           <Typography variant="caption">
             {new Date(message.date.seconds * 1000).toTimeString().split(" ")[0]}
@@ -71,10 +63,11 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
         </Box>
         <Card
           sx={{
-            maxWidth: 400,
+            maxWidth: { xs: 170, sm: 300, md: 450 },
             display: "flex",
             flexDirection: "column",
-            padding: "11px",
+            padding: { xs: 1, md:'11px' },
+            gap:1
           }}
         >
           <Box
@@ -94,9 +87,7 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
                 textAlign: "justify",
               }}
             >
-              {senderUser
-                ? `${enemyUser.displayName}`
-                : `${user.displayName}`}
+              {senderUser ? `${enemyUser.displayName}` : `${user.displayName}`}
             </Typography>
           </Box>
 
@@ -108,9 +99,7 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
           >
             {message.text}
           </Typography>
-          {message.img && (
-            <img style={{ maxWidth: "300px",width:'100%' }} src={message.img} alt="" />
-          )}
+          {message.img && <img src={message.img} alt="" />}
         </Card>
       </Box>
     );

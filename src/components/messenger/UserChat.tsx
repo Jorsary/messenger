@@ -33,7 +33,6 @@ const UserChat = ({ info }: any) => {
     <Card
       onClick={() => handleSelectChat(userInfo)}
       sx={{
-        boxSizing: "border-box",
         minHeight: 64,
         px: 2,
         py: 1,

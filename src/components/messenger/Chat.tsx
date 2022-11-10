@@ -1,14 +1,21 @@
-import { Avatar, Box, Typography, AppBar, Toolbar } from "@mui/material";
+import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Toolbar,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import { doc, onSnapshot } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
+import { db } from "../../firebase/firebase";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import stringToColor from "../../utlis/stringToColor";
 import InputMessage from "./InputMessage";
 import Message from "./Message";
-import { useAppSelector } from "../../hooks/redux-hooks";
-import { useState, useEffect, useRef } from "react";
-import styles from "./Chat.module.scss";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
-import stringToColor from "../../utlis/stringToColor";
-import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
-
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import { openChat } from "../../store/chatSlice";
 export interface IMessage {
   date: { seconds: number; nanoseconds: number };
   id: string;
@@ -17,10 +24,11 @@ export interface IMessage {
 }
 
 const Chat = () => {
-  const { chatId, enemyUser } = useAppSelector((state) => state.chat);
+  const { chatId, enemyUser,chatOpened } = useAppSelector((state) => state.chat);
   const { currentUser } = useAppSelector((state) => state.user);
   const chatRef = useRef<HTMLDivElement | null>(null);
   const [messages, setMessages] = useState<Array<IMessage>>([]);
+  const dispatch = useAppDispatch()
   useEffect(() => {
     try {
       const unSub = onSnapshot(doc(db, "chats", chatId), (doc) => {
@@ -39,14 +47,20 @@ const Chat = () => {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
   }, [messages]);
+  useEffect(() => {
+    console.log(chatOpened)
+  }, [chatOpened]);
+
+  const open = chatOpened ? 'none' : 'block'
   if (enemyUser)
     return (
       <Box
         sx={{
-          padding: 1,
+          padding: {xs:0,md:1},
           position: "relative",
           flex: "3",
-          maxHeight:'90vh'
+          maxHeight: "90vh",
+          display:open
         }}
       >
         <AppBar
@@ -56,13 +70,20 @@ const Chat = () => {
             borderRadius: 1,
           }}
         >
-          <Toolbar sx={{ display: "flex", gap: 1 }}>
-            <Avatar
-              {...stringToColor(`${enemyUser?.displayName}`)}
-              src={`${enemyUser?.photoURL}`}
-              alt={`${enemyUser?.displayName}`}
-            />
-            <Typography>{enemyUser?.displayName}</Typography>
+          <Toolbar
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <IconButton onClick={()=>dispatch(openChat())} sx={{display: { xs: "flex", md: "none" }}}>
+              <ArrowBackRoundedIcon />
+            </IconButton>
+            <Box sx={{display:'flex',alignItems:'center', gap: 1,}}>
+              <Avatar
+                {...stringToColor(`${enemyUser?.displayName}`)}
+                src={`${enemyUser?.photoURL}`}
+                alt={`${enemyUser?.displayName}`}
+              />
+              <Typography>{enemyUser?.displayName}</Typography>
+            </Box>
           </Toolbar>
         </AppBar>
         <Box
@@ -74,7 +95,7 @@ const Chat = () => {
             overflowY: "auto",
             scrollBehavior: "smooth",
             gap: 2,
-            height:'80%'
+            height: "80%",
           }}
           position="relative"
           ref={chatRef}
@@ -99,7 +120,7 @@ const Chat = () => {
           position: "relative",
           flex: "3",
           height: "100%",
-          display: "flex",
+          display:{xs:open, md:'flex'},
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
