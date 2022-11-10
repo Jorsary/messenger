@@ -1,6 +1,6 @@
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { Box, Button, Input, TextField,Card } from "@mui/material";
+import { Box, Button, Input, TextField, Card } from "@mui/material";
 import {
   arrayUnion,
   doc,
@@ -28,67 +28,67 @@ const InputMessage = () => {
       return;
     }
     setImg(e.target.files[0]);
-
   };
 
   const handleSend = async () => {
-    if (currentUser && enemyUser) {
-      if (img) {
-        const storageRef = ref(storage, uuid());
-        await uploadBytesResumable(storageRef, img);
-        const downloadURL = await getDownloadURL(storageRef);
-        await updateDoc(doc(db, "chats", chatId), {
-          messages: arrayUnion({
-            id: uuid(),
+      if (currentUser && enemyUser) {
+        if (img) {
+          const storageRef = ref(storage, uuid());
+          await uploadBytesResumable(storageRef, img);
+          const downloadURL = await getDownloadURL(storageRef);
+          await updateDoc(doc(db, "chats", chatId), {
+            messages: arrayUnion({
+              id: uuid(),
+              text,
+              senderId: currentUser.uid,
+              date: Timestamp.now(),
+              img: downloadURL,
+            }),
+          });
+        } else {
+          await updateDoc(doc(db, "chats", chatId), {
+            messages: arrayUnion({
+              id: uuid(),
+              text,
+              senderId: currentUser?.uid,
+              date: Timestamp.now(),
+            }),
+          });
+        }
+
+        await updateDoc(doc(db, "userChats", currentUser.uid), {
+          [chatId + ".lastMessage"]: {
             text,
-            senderId: currentUser.uid,
-            date: Timestamp.now(),
-            img: downloadURL,
-          }),
+          },
+          [chatId + ".date"]: serverTimestamp(),
         });
-      } else {
-        await updateDoc(doc(db, "chats", chatId), {
-          messages: arrayUnion({
-            id: uuid(),
+
+        await updateDoc(doc(db, "userChats", enemyUser.uid), {
+          [chatId + ".lastMessage"]: {
             text,
-            senderId: currentUser?.uid,
-            date: Timestamp.now(),
-          }),
+          },
+          [chatId + ".date"]: serverTimestamp(),
         });
-      }
 
-      await updateDoc(doc(db, "userChats", currentUser.uid), {
-        [chatId + ".lastMessage"]: {
-          text,
-        },
-        [chatId + ".date"]: serverTimestamp(),
-      });
-
-      await updateDoc(doc(db, "userChats", enemyUser.uid), {
-        [chatId + ".lastMessage"]: {
-          text,
-        },
-        [chatId + ".date"]: serverTimestamp(),
-      });
-
-      setText("");
-      setImg(null);
-      if (imgRef.current) {
-        imgRef.current.value=''
-        console.log(imgRef.current.files)
-      }
+        setText("");
+        setImg(null);
+        if (imgRef.current) {
+          imgRef.current.value = "";
+          console.log(imgRef.current.files);
+        }
+      
     }
   };
 
   return (
     <Card
       sx={{
-        position:'absolute',
+        position: "absolute",
         bottom: 0,
         boxShadow: 3,
         borderRadius: 1,
         padding: 1,
-        width:'100%'
+        width: "100%",
       }}
     >
       <Box
@@ -113,7 +113,7 @@ const InputMessage = () => {
           autoFocus
         />
         <input
-          style={{display:'none'}}
+          style={{ display: "none" }}
           id="raised-button-file"
           type="file"
           ref={imgRef}
@@ -121,10 +121,10 @@ const InputMessage = () => {
         />
         <label htmlFor="raised-button-file">
           <Button component="span">
-            <AttachFileIcon/>
+            <AttachFileIcon />
           </Button>
         </label>
-        <Button type="submit">
+        <Button disabled={!text && !img} type="submit">
           <SendRoundedIcon></SendRoundedIcon>
         </Button>
       </Box>

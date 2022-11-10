@@ -76,7 +76,6 @@ const Search = () => {
       e.preventDefault()
       handleSearch()}}>
       <TextField
-        required
         fullWidth
         id="Search"
         label="Поиск..."

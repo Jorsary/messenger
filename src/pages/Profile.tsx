@@ -30,18 +30,22 @@ const Profile = () => {
         sx={{
           boxShadow: 4,
           display: "flex",
+          flexDirection:'column',
           borderRadius: 5,
           padding: 4,
+          alignItems:'center',
+          textAlign:'center'
         }}
       >
         <Avatar
           aria-describedby={id}
           onClick={(e) => handleClick(e)}
           sx={{
-            width: 250,
-            height: 250,
-            mr: "2%",
-            background:'white'
+            maxWidth: 250,
+            maxHeight: 250,
+            background:'white',
+            width:'50vw',
+            height:'50vw'
           }}
           alt={`${currentUser?.displayName}`}
           src={`${currentUser?.photoURL}`}
@@ -61,15 +65,13 @@ const Profile = () => {
         </Popover>
         <Box
           sx={{
-            py: 12,
             display: "flex",
             flexDirection: "column",
             gap: 2,
+            mt:1
           }}
         >
           <Typography
-            variant="h6"
-            component="h2"
             sx={{
               fontFamily: "monospace",
               fontWeight: 700,
@@ -81,8 +83,6 @@ const Profile = () => {
             {currentUser?.displayName}
           </Typography>
           <Typography
-            variant="h6"
-            component="h2"
             sx={{
               fontFamily: "monospace",
               fontWeight: 700,
