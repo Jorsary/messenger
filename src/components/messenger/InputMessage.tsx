@@ -1,6 +1,6 @@
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { Box, Button, Input, TextField } from "@mui/material";
+import { Box, Button, Input, TextField,Card } from "@mui/material";
 import {
   arrayUnion,
   doc,
@@ -81,16 +81,14 @@ const InputMessage = () => {
   };
 
   return (
-    <Box
-      position="absolute"
-      color="primary"
+    <Card
       sx={{
-        top: "auto",
+        position:'absolute',
         bottom: 0,
         boxShadow: 3,
         borderRadius: 1,
-        width: "100%",
         padding: 1,
+        width:'100%'
       }}
     >
       <Box
@@ -106,14 +104,13 @@ const InputMessage = () => {
         }}
       >
         <TextField
-          required
           fullWidth
           id="message"
           label="Введите сообщение"
           name="message"
           onChange={(e) => setText(e.target.value)}
-          autoFocus
           value={text}
+          autoFocus
         />
         <input
           style={{display:'none'}}
@@ -131,7 +128,7 @@ const InputMessage = () => {
           <SendRoundedIcon></SendRoundedIcon>
         </Button>
       </Box>
-    </Box>
+    </Card>
   );
 };
 

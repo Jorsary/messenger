@@ -84,7 +84,6 @@ const Search = () => {
         onChange={(e: any) => {
           setUserAName(e.target.value);
         }}
-        autoFocus
       />
       {userAnother && (
         <Card onClick={handleSelect} sx={{

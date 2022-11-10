@@ -15,6 +15,7 @@ import {
 } from "react-firebase-hooks/auth";
 import { useForm } from "react-hook-form";
 import { Navigate, useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 import { auth, db } from "../firebase/firebase";
 import { useAppSelector } from "../hooks/redux-hooks";
 interface IAuthForm {
@@ -71,13 +72,7 @@ export default function SignUp() {
     return <Navigate to="/" />;
   }
   if (loading || loadingUser) {
-    return (
-      <Box
-        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-      >
-        <CircularProgress color="secondary" />
-      </Box>
-    );
+    <Loader />
   }
   return (
     <Container component="main" maxWidth="xs">

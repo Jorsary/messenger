@@ -8,23 +8,13 @@ const Messenger = () => {
     <Container
       maxWidth="lg"
       sx={{
-        height:'85vh',
-        display:'flex',
-        mt:1
+        height: "85vh",
+        display: "flex",
+        mt: 1,
       }}
     >
-      {/* <Box
-        sx={{
-          boxShadow: 4,
-          display: "flex",
-          borderRadius: 5,
-          padding: 4,
-          height: "80vh",
-        }}
-      > */}
-        <Chats />
-        <Chat/>
-      {/* </Box> */}
+      <Chats />
+      <Chat />
     </Container>
   );
 };

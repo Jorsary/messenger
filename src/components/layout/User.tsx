@@ -8,6 +8,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import { SettingsLinks } from "../../models";
+import stringToColor from "../../utlis/stringToColor";
 
 interface UserProps {
   settings: SettingsLinks[];
@@ -43,9 +44,7 @@ const User = ({ settings }: UserProps) => {
             <Avatar
               alt={`${currentUser?.displayName}`}
               src={`${currentUser?.photoURL}`}
-              sx={{
-                background:'white'
-              }}
+              {...stringToColor(`${currentUser?.displayName}`)}
             />
           </IconButton>
         </Tooltip>

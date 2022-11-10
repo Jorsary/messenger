@@ -4,6 +4,7 @@ import { getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { changeUser } from "../../store/chatSlice";
+import stringToColor from "../../utlis/stringToColor";
 
 const UserChat = ({ info }: any) => {
   const { currentUser } = useAppSelector((state) => state.user);
@@ -49,9 +50,9 @@ const UserChat = ({ info }: any) => {
       }}
     >
       <Avatar
+        {...stringToColor(`${userInfo.displayName}`)}
+        src={`${userInfo.photoURL}`}
         alt={userInfo.displayName}
-        src={userInfo.photoURL}
-        sx={{ background: "white" }}
       />
       <Box>
         <Typography variant="body1">{userInfo.displayName}</Typography>

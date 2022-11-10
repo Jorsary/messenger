@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { User, UserInfo } from "firebase/auth";
+import stringToColor from "../../utlis/stringToColor";
 
 interface InfoMessage {
   message: IMessage;
@@ -22,8 +23,11 @@ export interface IMessage {
   text: string;
   img?: string;
 }
-// { message, user, enemyUser }: InfoMessage
+
+
+
 const Message = ({ message, user, enemyUser }: InfoMessage) => {
+  const senderUser = message.senderId === enemyUser?.uid
   if (user && enemyUser) {
     return (
       <Box
@@ -48,11 +52,18 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
         >
           <Avatar
             src={
-              message.senderId === enemyUser?.uid
+              senderUser
                 ? `${enemyUser.photoURL}`
                 : `${user.photoURL}`
             }
-            sx={{ background: "white" }}
+            alt={
+              senderUser
+                ? `${enemyUser.displayName}`
+                : `${user.displayName}`}
+            {...stringToColor(
+              senderUser
+                ? `${enemyUser.displayName}`
+                : `${user.displayName}`)}
           />
           <Typography variant="caption">
             {new Date(message.date.seconds * 1000).toTimeString().split(" ")[0]}
@@ -83,7 +94,7 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
                 textAlign: "justify",
               }}
             >
-              {message.senderId === enemyUser?.uid
+              {senderUser
                 ? `${enemyUser.displayName}`
                 : `${user.displayName}`}
             </Typography>
