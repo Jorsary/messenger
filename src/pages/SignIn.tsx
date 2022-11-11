@@ -5,33 +5,41 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Container from "@mui/material/Container";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { getAuth } from "firebase/auth";
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { Navigate, useNavigate } from "react-router-dom";
-import { app } from "../firebase/firebase";
-import { SubmitHandler, useForm } from "react-hook-form";
-import CircularProgress from "@mui/material/CircularProgress";
-import { useAppSelector } from "../hooks/redux-hooks";
+import {
+  ConfirmationResult,
+  RecaptchaVerifier,
+  signInWithPhoneNumber
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Navigate } from "react-router-dom";
 import Loader from "../components/Loader";
+import { auth, db } from "../firebase/firebase";
+import { useAppSelector } from "../hooks/redux-hooks";
 
 interface IAuthForm {
-  email: string;
+  phone: string;
   password: string;
+  otp: string;
+}
+
+declare global {
+  interface Window {
+    recaptchaVerifier: RecaptchaVerifier;
+    confirmationResult: ConfirmationResult;
+  }
 }
 
 export default function SignIn() {
-  const {currentUser,loadingUser} = useAppSelector(state=>state.user)
-  const push = useNavigate();
-  const auth = getAuth(app);
-  const [signInWithEmailAndPassword, user, loading, error] =
-    useSignInWithEmailAndPassword(auth);
-  const handleLogin = (email: string, password: string) => {
-    signInWithEmailAndPassword(email, password);
-  };
+  const [flag, setFlag] = useState(false);
+  const [result, setResult] = useState<ConfirmationResult>();
+  const [number, setNumber] = useState("");
+  const { currentUser, loadingUser } = useAppSelector((state) => state.user);
+  const [loading, setLoading] = useState(false);
+  
 
   const {
     register,
@@ -39,22 +47,60 @@ export default function SignIn() {
     handleSubmit,
     reset,
   } = useForm<IAuthForm>({
-    mode: "all",
+    mode: "onSubmit",
   });
 
-  const onSubmit = (data: IAuthForm) => {
-    handleLogin(data.email, data.password);
+  function generateRecaptcha(number: string) {
+    const recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      { size: "invisible" },
+      auth
+    );
+    recaptchaVerifier.render();
+    return signInWithPhoneNumber(auth, number, recaptchaVerifier);
+  }
+
+  const onSubmit = async (data: IAuthForm) => {
+
+    try {
+      const response = await generateRecaptcha(data.phone);
+      setResult(response);
+      setFlag(true);
+      setNumber(data.phone);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  
+  const verifyOtp = async (data: IAuthForm) => {
+    setLoading(true)
+    try {
+      const res = await result?.confirm(data.otp);
+      if (!res?.user.displayName && res?.user) {
+        await setDoc(doc(db, "users", res.user.uid), {
+          uid: res.user.uid,
+          phoneNumber: number,
+        });
+        await setDoc(doc(db, "userChats", res.user.uid), {});
+      } else {
+        console.log("второй раз");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    setLoading(false)
+
+  };
+
+  //   getDoc(doc(db, "users", currentUser?.uid)).then((doc) =>
+  //   console.log(doc.data())
+  // );
 
   if (currentUser) {
     return <Navigate to="/" />;
   }
-  if (loading || loadingUser) {
-    return (
-      <Loader />
-    );
+  if(loadingUser || loading) {
+    return <Box sx={{height:'80vh'}}><Loader /></Box>
   }
   return (
     <Container component="main" maxWidth="xs">
@@ -72,77 +118,86 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Вход
         </Typography>
-        <Box
-          component="form"
-          onSubmit={handleSubmit((data) => {
-            onSubmit(data);
-            reset();
-          })}
-          noValidate
-          sx={{ mt: 1 }}
-        >
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Адрес эл. почты"
-            autoComplete="email"
-            autoFocus
-            {...register("email", {
-              required: "Поле не может быть пустым",
-              pattern: {
-                value:
-                  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
-                message: "Некорректный email",
-              },
+        {!flag ? (
+          <Box
+            component="form"
+            onSubmit={handleSubmit((data) => {
+              onSubmit(data);
+              reset();
             })}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Пароль"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            {...register("password", {
-              required: "Поле не может быть пустым",
-              pattern: {
-                value: /[A-Za-z0-9]/g,
-                message: "Некорректный password",
-              },
-              minLength: {
-                value: 6,
-                message: `Минимальная длина 6 символов`,
-              },
-            })}
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Запомнить меня"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            noValidate
+            sx={{ mt: 1 }}
           >
-            Войти
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Забыли пароль?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link onClick={() => push("/signup")} variant="body2">
-                {"Нет аккаунта? Зарегистрироваться"}
-              </Link>
-            </Grid>
-          </Grid>
-        </Box>
+            <TextField
+              error={!!errors.phone?.message}
+              margin="normal"
+              required
+              fullWidth
+              id="phone"
+              label="Номер телефона"
+              autoComplete="phone"
+              autoFocus
+              {...register("phone", {
+                required: "Поле не может быть пустым",
+                pattern: {
+                  value:
+                    /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im,
+                  message: "Некорректный номер телефона",
+                },
+              })}
+            />
+            <FormControlLabel
+              control={<Checkbox value="remember" color="primary" />}
+              label="Запомнить меня"
+            />
+            <Box id="recaptcha-container"></Box>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Войти
+            </Button>
+            <Box id="recaptcha"></Box>
+          </Box>
+        ) : (
+          <Box
+            component="form"
+            onSubmit={handleSubmit((data) => {
+              verifyOtp(data);
+              reset();
+            })}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+            <TextField
+              error={!!errors.otp?.message}
+              margin="normal"
+              required
+              fullWidth
+              id="otp"
+              label="6-значный код"
+              autoComplete="otp"
+              autoFocus
+              {...register("otp", {
+                required: "Поле не может быть пустым",
+                pattern: {
+                  value: /^([0-9]{6})$|^([0-9]{6})$/im,
+                  message: "Введите 6 значный код",
+                },
+              })}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Подтвердить код
+            </Button>
+          </Box>
+        )}
       </Box>
     </Container>
   );

@@ -6,6 +6,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import { SettingsLinks } from "../../models";
 import stringToColor from "../../utlis/stringToColor";
@@ -36,18 +37,17 @@ const User = ({ settings }: UserProps) => {
     setAnchorElUser(null);
   };
 
-  if (!!currentUser) {
+  if (currentUser && currentUser.displayName) {
     return (
       <>
-        <Tooltip title="Open settings">
           <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
             <Avatar
               alt={`${currentUser?.displayName}`}
               src={`${currentUser?.photoURL}`}
-              {...stringToColor(`${currentUser?.displayName}`)}
+              sx={{bgcolor:stringToColor(`${currentUser?.displayName}`)}}
             />
           </IconButton>
-        </Tooltip>
+          {auth.currentUser?.displayName}
         <Menu
           sx={{ mt: "45px" }}
           id="menu-appbar"
@@ -81,3 +81,4 @@ const User = ({ settings }: UserProps) => {
 };
 
 export default User;
+ 

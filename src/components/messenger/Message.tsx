@@ -53,9 +53,12 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
             alt={
               senderUser ? `${enemyUser.displayName}` : `${user.displayName}`
             }
-            {...stringToColor(
-              senderUser ? `${enemyUser.displayName}` : `${user.displayName}`
-            )}
+            sx={{
+              bgcolor:stringToColor(
+                senderUser ? `${enemyUser.displayName}` : `${user.displayName}`
+              )
+              }}
+            
           />
           <Typography variant="caption">
             {new Date(message.date.seconds * 1000).toTimeString().split(" ")[0]}

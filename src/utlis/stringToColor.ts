@@ -10,9 +10,7 @@ export default function stringToColor(name: string) {
     const value = (hash >> (i * 8)) & 0xff;
     color += `00${value.toString(16)}`.slice(-2);
   }
-  return {
-    sx: {
-      bgcolor: color
-    },
-  };
+  return color
+
+
 }

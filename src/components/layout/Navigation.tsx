@@ -66,7 +66,7 @@ const Navigation = ({ links }: NavigationProps) => {
           }}
         >
           {links
-            .filter((page) => !page.auth || currentUser)
+            .filter((page) => !page.auth || currentUser.displayName)
             .map((page) => (
               <MenuItem
                 key={page.title}
@@ -121,7 +121,7 @@ const Navigation = ({ links }: NavigationProps) => {
           messenger
         </Typography>
         {links
-          .filter((page) => !page.auth || currentUser)
+          .filter((page) => !page.auth || currentUser?.displayName)
           .map((page) => (
             <MenuItem
               key={page.title}

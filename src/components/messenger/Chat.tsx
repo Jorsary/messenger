@@ -78,7 +78,7 @@ const Chat = () => {
             </IconButton>
             <Box sx={{display:'flex',alignItems:'center', gap: 1,}}>
               <Avatar
-                {...stringToColor(`${enemyUser?.displayName}`)}
+                sx={{bgcolor:stringToColor(`${enemyUser?.displayName}`)}}
                 src={`${enemyUser?.photoURL}`}
                 alt={`${enemyUser?.displayName}`}
               />

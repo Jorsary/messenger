@@ -49,7 +49,9 @@ const UserChat = ({ info }: any) => {
       }}
     >
       <Avatar
-        {...stringToColor(`${userInfo.displayName}`)}
+        sx={{
+        bgcolor:stringToColor(`${userInfo.displayName}`)
+        }}
         src={`${userInfo.photoURL}`}
         alt={userInfo.displayName}
       />

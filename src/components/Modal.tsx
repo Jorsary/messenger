@@ -4,21 +4,19 @@ import {
   Button,
   Container,
   Input,
-  Typography,
+  Typography
 } from "@mui/material";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { ChangeEvent, useEffect, useState } from "react";
-import { useUpdateProfile } from "react-firebase-hooks/auth";
-import { auth, db, storage } from "../firebase/firebase";
+import { db, storage } from "../firebase/firebase";
 import { useAppSelector } from "../hooks/redux-hooks";
 
-const Modal = () => {
+const Modal = ({ setLoading, onClose }: any) => {
   const { currentUser } = useAppSelector((state) => state.user);
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
   const [preview, setPreview] = useState<undefined | string>();
-  
 
   useEffect(() => {
     if (!selectedFile) {
@@ -41,6 +39,7 @@ const Modal = () => {
 
   const handleChangeAvatar = async (e: any) => {
     e.preventDefault();
+    setLoading(true);
     if (currentUser && currentUser.displayName && selectedFile) {
       const date = new Date().getTime();
       const storageRef = ref(storage, `${currentUser.displayName + date}`);
@@ -53,6 +52,8 @@ const Modal = () => {
       await updateDoc(doc(db, "users", currentUser.uid), {
         photoURL: downloadURL,
       });
+      setLoading(false);
+      onClose();
     }
   };
   return (

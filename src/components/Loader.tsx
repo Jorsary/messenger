@@ -12,7 +12,7 @@ const Loader = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: "90vh",
+        height:'100%'
       }}
     >
       <CircularProgress color="secondary" />
