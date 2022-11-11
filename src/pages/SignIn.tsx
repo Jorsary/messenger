@@ -80,8 +80,6 @@ export default function SignIn() {
           phoneNumber: number,
         });
         await setDoc(doc(db, "userChats", res.user.uid), {});
-      } else {
-        console.log("второй раз");
       }
     } catch (err) {
       console.log(err);

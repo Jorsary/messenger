@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import UserSettings from "./pages/ProfileSettings";
 import SignIn from "./pages/SignIn";
 import { setUser, setUserInfo } from "./store/userSlice";
+import SendRoundedIcon from "@mui/icons-material/SendRounded";
 
 export const darkTheme = createTheme({
   palette: {
@@ -43,11 +44,7 @@ function App() {
   useEffect(() => {
     setPersistence(auth, browserLocalPersistence);
   }, []);
-  console.log(user);
-  console.log(
-    // new Date(user?.metadata.lastSignInTime * 1000).toTimeString().split(" ")
-  );
-  //
+
   return (
     <ThemeProvider theme={darkMode ? darkTheme : ligthTheme}>
       <CssBaseline />

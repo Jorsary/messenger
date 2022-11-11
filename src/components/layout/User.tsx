@@ -43,16 +43,7 @@ const User = ({ settings }: UserProps) => {
               src={`${photoURL}`}
               sx={{ bgcolor: stringToColor(`${displayName}`) }}
             />
-            <Typography
-              sx={{
-                fontSize: 15,
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".2rem",
-              }}
-            >
-              {displayName}
-            </Typography>
+            
           </IconButton>
           <Menu
             sx={{ mt: "45px" }}
@@ -75,7 +66,7 @@ const User = ({ settings }: UserProps) => {
                 key={setting.title}
                 onClick={() => handleFollowToLink(setting.path)}
               >
-                <Typography textAlign="center">{setting.title}</Typography>
+                <Typography sx={{display:'flex',alignItems:'center'}} textAlign="center">{setting.icon}{setting.title}</Typography>
               </MenuItem>
             ))}
           </Menu>

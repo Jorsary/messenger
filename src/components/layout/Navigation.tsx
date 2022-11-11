@@ -73,7 +73,7 @@ const Navigation = ({ links }: NavigationProps) => {
                   key={page.title}
                   onClick={() => handleFollowToLink(page.path)}
                 >
-                  <Typography textAlign="center">{page.title}</Typography>
+                  <Typography sx={{display:'flex',alignItems:'center'}} textAlign="center">{page.icon}{page.title}</Typography>
                 </MenuItem>
               ))}
           </Menu>
@@ -129,7 +129,7 @@ const Navigation = ({ links }: NavigationProps) => {
               key={page.title}
               onClick={() => handleFollowToLink(page.path)}
             >
-              <Typography textAlign="center">{page.title}</Typography>
+              <Typography sx={{display:'flex',alignItems:'center'}} textAlign="center">{page.icon}{page.title}</Typography>
             </MenuItem>
           ))}
       </Box>

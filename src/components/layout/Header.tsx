@@ -1,4 +1,3 @@
-import { DarkMode } from "@mui/icons-material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -9,14 +8,15 @@ import { NavLinks } from "../../models";
 import { setTheme } from "../../store/themeSlice";
 import Navigation from "./Navigation";
 import User from "./User";
+import ManageAccountsRoundedIcon from '@mui/icons-material/ManageAccountsRounded';
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import Brightness4RoundedIcon from '@mui/icons-material/Brightness4Rounded';
+import ForumRoundedIcon from '@mui/icons-material/ForumRounded';
 
 const links: NavLinks[] = [
   {
-    title: "Профиль",
-    auth: true,
-    path: "/",
-  },
-  {
+    icon: <ForumRoundedIcon/>,
     title: "Мессенджер",
     auth: true,
     path: "/messenger",
@@ -24,14 +24,17 @@ const links: NavLinks[] = [
 ];
 const settings = [
   {
+    icon: <PersonRoundedIcon/>,
     title: "Профиль",
     path: "/",
   },
   {
+    icon: <ManageAccountsRoundedIcon/>,
     title: "Настройки",
     path: "/settings",
   },
   {
+    icon: <LogoutRoundedIcon/>,
     title: "Выйти",
     path: "/logout",
   },
@@ -46,7 +49,7 @@ const Header = () => {
           <Navigation links={links} />
           <Box sx={{ ml: "auto", display: "flex", gap: "2%" }}>
             <IconButton onClick={() => dispatch(setTheme())}>
-              <DarkMode></DarkMode>
+              <Brightness4RoundedIcon></Brightness4RoundedIcon>
             </IconButton>
             <User settings={settings} />
           </Box>
