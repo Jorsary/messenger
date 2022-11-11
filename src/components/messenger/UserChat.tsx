@@ -52,11 +52,11 @@ const UserChat = ({ info }: any) => {
         sx={{
           bgcolor: stringToColor(`${displayName}`),
         }}
-        src={`${photoURL}`}
-        alt={displayName}
+        src={`${userInfo.photoURL}`}
+        alt={userInfo.displayName}
       />
       <Box>
-        <Typography variant="body1">{displayName}</Typography>
+        <Typography variant="body1">{userInfo.displayName}</Typography>
         <Typography
           color="text.disabled"
           variant="body1"
