@@ -1,8 +1,8 @@
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 
-interface propType{
-  isLoad:boolean
+interface propType {
+  isLoad: boolean;
 }
 
 const Loader = () => {
@@ -12,13 +12,12 @@ const Loader = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height:'100%'
+        height: "100%",
       }}
     >
       <CircularProgress color="secondary" />
     </Box>
   );
-  
 };
 
 export default Loader;

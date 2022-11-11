@@ -37,9 +37,8 @@ export default function SignIn() {
   const [flag, setFlag] = useState(false);
   const [result, setResult] = useState<ConfirmationResult>();
   const [number, setNumber] = useState("");
-  const { currentUser, loadingUser } = useAppSelector((state) => state.user);
+  const { loadingUser } = useAppSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
-  
 
   const {
     register,
@@ -61,7 +60,6 @@ export default function SignIn() {
   }
 
   const onSubmit = async (data: IAuthForm) => {
-
     try {
       const response = await generateRecaptcha(data.phone);
       setResult(response);
@@ -73,7 +71,7 @@ export default function SignIn() {
   };
 
   const verifyOtp = async (data: IAuthForm) => {
-    setLoading(true)
+    setLoading(true);
     try {
       const res = await result?.confirm(data.otp);
       if (!res?.user.displayName && res?.user) {
@@ -88,19 +86,18 @@ export default function SignIn() {
     } catch (err) {
       console.log(err);
     }
-    setLoading(false)
-
+    setLoading(false);
   };
 
-  //   getDoc(doc(db, "users", currentUser?.uid)).then((doc) =>
-  //   console.log(doc.data())
-  // );
-
-  if (currentUser) {
+  if (auth.currentUser) {
     return <Navigate to="/" />;
   }
-  if(loadingUser || loading) {
-    return <Box sx={{height:'80vh'}}><Loader /></Box>
+  if (loadingUser || loading) {
+    return (
+      <Box sx={{ height: "80vh" }}>
+        <Loader />
+      </Box>
+    );
   }
   return (
     <Container component="main" maxWidth="xs">

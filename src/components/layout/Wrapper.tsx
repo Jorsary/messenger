@@ -1,12 +1,11 @@
-import React from "react";
 import { Box, Container } from "@mui/system";
-import { ImageTwoTone } from "@mui/icons-material";
+import React from "react";
 
 interface PropsState {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
-const Wrapper = ({children}: PropsState) => {
+const Wrapper = ({ children }: PropsState) => {
   return (
     <Container
       maxWidth="lg"
@@ -18,13 +17,12 @@ const Wrapper = ({children}: PropsState) => {
         sx={{
           boxShadow: { xs: 0, md: 4 },
           borderRadius: 5,
-          display:'flex',
+          display: "flex",
           padding: { xs: 0, md: 4 },
           height: { xs: "85vh", md: "90vh" },
           width: "100%",
         }}
       >
-        
         {children}
       </Box>
     </Container>

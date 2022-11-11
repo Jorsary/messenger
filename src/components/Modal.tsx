@@ -10,13 +10,15 @@ import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { ChangeEvent, useEffect, useState } from "react";
-import { db, storage } from "../firebase/firebase";
-import { useAppSelector } from "../hooks/redux-hooks";
+import { auth, db, storage } from "../firebase/firebase";
+import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
+import { setUserInfo } from "../store/userSlice";
 
 const Modal = ({ setLoading, onClose }: any) => {
-  const { currentUser } = useAppSelector((state) => state.user);
+  const { displayName, photoURL } = useAppSelector((state) => state.user);
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
   const [preview, setPreview] = useState<undefined | string>();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!selectedFile) {
@@ -40,18 +42,19 @@ const Modal = ({ setLoading, onClose }: any) => {
   const handleChangeAvatar = async (e: any) => {
     e.preventDefault();
     setLoading(true);
-    if (currentUser && currentUser.displayName && selectedFile) {
+    if (auth.currentUser && displayName && selectedFile) {
       const date = new Date().getTime();
-      const storageRef = ref(storage, `${currentUser.displayName + date}`);
+      const storageRef = ref(storage, `${displayName + date}`);
       await uploadBytesResumable(storageRef, selectedFile);
       const downloadURL = await getDownloadURL(storageRef);
-      await updateProfile(currentUser, {
-        displayName: currentUser.displayName,
+      await updateProfile(auth.currentUser, {
+        displayName: displayName,
         photoURL: downloadURL,
       });
-      await updateDoc(doc(db, "users", currentUser.uid), {
+      await updateDoc(doc(db, "users", auth.currentUser.uid), {
         photoURL: downloadURL,
       });
+      dispatch(setUserInfo({ ...auth.currentUser }));
       setLoading(false);
       onClose();
     }

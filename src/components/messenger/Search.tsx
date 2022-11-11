@@ -3,26 +3,25 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs, query,
+  getDocs,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
   where
 } from "firebase/firestore";
 import { useState } from "react";
-import { db } from "../../firebase/firebase";
-import { useAppSelector } from "../../hooks/redux-hooks";
+import { auth, db } from "../../firebase/firebase";
 
 const Search = () => {
   const [userAName, setUserAName] = useState("");
   const [userAnother, setUserAnother] = useState<any>();
   const [err, setErr] = useState(false);
-  const { currentUser } = useAppSelector((state) => state.user);
 
   const handleSearch = async () => {
     const q = query(
       collection(db, "users"),
-      where("displayName", "==", userAName)
+      where("displayName", "==", userAName),
     );
 
     try {
@@ -34,15 +33,15 @@ const Search = () => {
     } catch (err) {
       setErr(true);
     }
-    console.log(userAnother)
+    console.log(userAnother);
   };
 
   const handleSelect = async () => {
-    if (currentUser) {
+    if (auth.currentUser) {
       const combinedId =
-        userAnother.uid > currentUser.uid
-          ? userAnother.uid + currentUser.uid
-          : currentUser.uid + userAnother.uid;
+        userAnother.uid > auth.currentUser.uid
+          ? userAnother.uid + auth.currentUser.uid
+          : auth.currentUser.uid + userAnother.uid;
 
       try {
         const res = await getDoc(doc(db, "chats", combinedId));
@@ -52,16 +51,16 @@ const Search = () => {
 
           await updateDoc(doc(db, "userChats", userAnother.uid), {
             [combinedId + ".userInfo"]: {
-              uid: currentUser.uid,
-              userRef: doc(db,'users',currentUser.uid)
+              uid: auth.currentUser.uid,
+              userRef: doc(db, "users", auth.currentUser.uid),
             },
             [combinedId + ".date"]: serverTimestamp(),
           });
 
-          await updateDoc(doc(db, "userChats", currentUser.uid), {
+          await updateDoc(doc(db, "userChats", auth.currentUser.uid), {
             [combinedId + ".userInfo"]: {
               uid: userAnother.uid,
-              userRef: doc(db,'users',userAnother.uid)
+              userRef: doc(db, "users", userAnother.uid),
             },
             [combinedId + ".date"]: serverTimestamp(),
           });
@@ -72,9 +71,13 @@ const Search = () => {
     }
   };
   return (
-    <Box component="form" onSubmit={(e) => {
-      e.preventDefault()
-      handleSearch()}}>
+    <Box
+      component="form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSearch();
+      }}
+    >
       <TextField
         fullWidth
         id="Search"
@@ -85,22 +88,25 @@ const Search = () => {
         }}
       />
       {userAnother && (
-        <Card onClick={handleSelect} sx={{
-          boxSizing: "border-box",
-          minHeight: 64,
-          px: 2,
-          py: 1,
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          cursor: "pointer",
-          boxShadow: 0,
-          transition: "all .2s ease-in-out",
-          "&:hover": {
-            transform: "translateY(-1px)",
-            boxShadow: 6,
-          },
-        }}>
+        <Card
+          onClick={handleSelect}
+          sx={{
+            boxSizing: "border-box",
+            minHeight: 64,
+            px: 2,
+            py: 1,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            cursor: "pointer",
+            boxShadow: 0,
+            transition: "all .2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-1px)",
+              boxShadow: 6,
+            },
+          }}
+        >
           <Avatar src={userAnother.photoURL} alt="" />
           <Typography>{userAnother.displayName}</Typography>
         </Card>

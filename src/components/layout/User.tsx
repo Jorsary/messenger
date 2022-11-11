@@ -1,10 +1,9 @@
-import Avatar from "@mui/material/Avatar";
+import { Avatar } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
@@ -16,11 +15,8 @@ interface UserProps {
 }
 
 const User = ({ settings }: UserProps) => {
-  const { currentUser } = useAppSelector((state) => state.user);
-
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
-  );
+  const { displayName, photoURL } = useAppSelector((state) => state.user);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const push = useNavigate();
 
@@ -37,48 +33,56 @@ const User = ({ settings }: UserProps) => {
     setAnchorElUser(null);
   };
 
-  if (currentUser && currentUser.displayName) {
-    return (
-      <>
-          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+  return (
+    <>
+      {auth.currentUser && (
+        <>
+          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, gap: 1 }}>
             <Avatar
-              alt={`${currentUser?.displayName}`}
-              src={`${currentUser?.photoURL}`}
-              sx={{bgcolor:stringToColor(`${currentUser?.displayName}`)}}
+              alt={`${displayName}`}
+              src={`${photoURL}`}
+              sx={{ bgcolor: stringToColor(`${displayName}`) }}
             />
-          </IconButton>
-          {auth.currentUser?.displayName}
-        <Menu
-          sx={{ mt: "45px" }}
-          id="menu-appbar"
-          anchorEl={anchorElUser}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={Boolean(anchorElUser)}
-          onClose={handleCloseUserMenu}
-        >
-          {settings.map((setting) => (
-            <MenuItem
-              key={setting.title}
-              onClick={() => handleFollowToLink(setting.path)}
+            <Typography
+              sx={{
+                fontSize: 15,
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".2rem",
+              }}
             >
-              <Typography textAlign="center">{setting.title}</Typography>
-            </MenuItem>
-          ))}
-        </Menu>
-      </>
-    );
-  } else {
-    return <></>;
-  }
+              {displayName}
+            </Typography>
+          </IconButton>
+          <Menu
+            sx={{ mt: "45px" }}
+            id="menu-appbar"
+            anchorEl={anchorElUser}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorElUser)}
+            onClose={handleCloseUserMenu}
+          >
+            {settings.map((setting) => (
+              <MenuItem
+                key={setting.title}
+                onClick={() => handleFollowToLink(setting.path)}
+              >
+                <Typography textAlign="center">{setting.title}</Typography>
+              </MenuItem>
+            ))}
+          </Menu>
+        </>
+      )}
+    </>
+  );
 };
 
 export default User;
- 

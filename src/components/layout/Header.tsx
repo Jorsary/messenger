@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import { useAppDispatch } from "../../hooks/redux-hooks";
 import { NavLinks } from "../../models";
 import { setTheme } from "../../store/themeSlice";
 import Navigation from "./Navigation";
@@ -38,14 +38,14 @@ const settings = [
 ];
 
 const Header = () => {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ display: "flex" }}>
           <Navigation links={links} />
-          <Box sx={{ ml: "auto", display: "flex",gap:'2%' }}>
-            <IconButton onClick={()=>dispatch(setTheme())}>
+          <Box sx={{ ml: "auto", display: "flex", gap: "2%" }}>
+            <IconButton onClick={() => dispatch(setTheme())}>
               <DarkMode></DarkMode>
             </IconButton>
             <User settings={settings} />

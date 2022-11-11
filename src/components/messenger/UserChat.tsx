@@ -1,21 +1,21 @@
-import { async } from "@firebase/util";
 import { Avatar, Box, Card, Typography } from "@mui/material";
 import { getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { auth } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { changeUser } from "../../store/chatSlice";
 import stringToColor from "../../utlis/stringToColor";
 
 const UserChat = ({ info }: any) => {
-  const { currentUser } = useAppSelector((state) => state.user);
+  const { photoURL, displayName } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
   const handleSelectChat = (u: any) => {
-    if (currentUser) {
+    if (auth.currentUser) {
       const res =
-        currentUser.uid > u.uid
-          ? currentUser.uid + u.uid
-          : u.uid + currentUser.uid;
+        auth.currentUser.uid > u.uid
+          ? auth.currentUser.uid + u.uid
+          : u.uid + auth.currentUser.uid;
       dispatch(changeUser({ u, res }));
     }
   };
@@ -50,13 +50,13 @@ const UserChat = ({ info }: any) => {
     >
       <Avatar
         sx={{
-        bgcolor:stringToColor(`${userInfo.displayName}`)
+          bgcolor: stringToColor(`${displayName}`),
         }}
-        src={`${userInfo.photoURL}`}
-        alt={userInfo.displayName}
+        src={`${photoURL}`}
+        alt={displayName}
       />
       <Box>
-        <Typography variant="body1">{userInfo.displayName}</Typography>
+        <Typography variant="body1">{displayName}</Typography>
         <Typography
           color="text.disabled"
           variant="body1"

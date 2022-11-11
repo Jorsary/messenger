@@ -1,11 +1,5 @@
-import React from "react";
 import {
-  Box,
-  Button,
-  TextField,
-  Card,
-  Avatar,
-  Typography,
+  Avatar, Box, Card, Typography
 } from "@mui/material";
 import { User, UserInfo } from "firebase/auth";
 import stringToColor from "../../utlis/stringToColor";
@@ -54,11 +48,10 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
               senderUser ? `${enemyUser.displayName}` : `${user.displayName}`
             }
             sx={{
-              bgcolor:stringToColor(
+              bgcolor: stringToColor(
                 senderUser ? `${enemyUser.displayName}` : `${user.displayName}`
-              )
-              }}
-            
+              ),
+            }}
           />
           <Typography variant="caption">
             {new Date(message.date.seconds * 1000).toTimeString().split(" ")[0]}
@@ -69,8 +62,8 @@ const Message = ({ message, user, enemyUser }: InfoMessage) => {
             maxWidth: { xs: 170, sm: 300, md: 450 },
             display: "flex",
             flexDirection: "column",
-            padding: { xs: 1, md:'11px' },
-            gap:1
+            padding: { xs: 1, md: "11px" },
+            gap: 1,
           }}
         >
           <Box

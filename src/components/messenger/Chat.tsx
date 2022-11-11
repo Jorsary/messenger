@@ -1,21 +1,19 @@
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
 import {
   AppBar,
   Avatar,
-  Box,
-  Toolbar,
-  Typography,
-  IconButton,
+  Box, IconButton, Toolbar,
+  Typography
 } from "@mui/material";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
-import { db } from "../../firebase/firebase";
+import { auth, db } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import { openChat } from "../../store/chatSlice";
 import stringToColor from "../../utlis/stringToColor";
 import InputMessage from "./InputMessage";
 import Message from "./Message";
-import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import { openChat } from "../../store/chatSlice";
 export interface IMessage {
   date: { seconds: number; nanoseconds: number };
   id: string;
@@ -24,11 +22,12 @@ export interface IMessage {
 }
 
 const Chat = () => {
-  const { chatId, enemyUser,chatOpened } = useAppSelector((state) => state.chat);
-  const { currentUser } = useAppSelector((state) => state.user);
+  const { chatId, enemyUser, chatOpened } = useAppSelector(
+    (state) => state.chat
+  );
   const chatRef = useRef<HTMLDivElement | null>(null);
   const [messages, setMessages] = useState<Array<IMessage>>([]);
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   useEffect(() => {
     try {
       const unSub = onSnapshot(doc(db, "chats", chatId), (doc) => {
@@ -47,20 +46,17 @@ const Chat = () => {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
   }, [messages]);
-  useEffect(() => {
-    console.log(chatOpened)
-  }, [chatOpened]);
 
-  const open = chatOpened ? 'none' : 'block'
+  const open = chatOpened ? "none" : "block";
   if (enemyUser)
     return (
       <Box
         sx={{
-          padding: {xs:0,md:1},
+          padding: { xs: 0, md: 1 },
           position: "relative",
           flex: "3",
           maxHeight: "90vh",
-          display:open
+          display: open,
         }}
       >
         <AppBar
@@ -70,15 +66,16 @@ const Chat = () => {
             borderRadius: 1,
           }}
         >
-          <Toolbar
-            sx={{ display: "flex", justifyContent: "space-between" }}
-          >
-            <IconButton onClick={()=>dispatch(openChat())} sx={{display: { xs: "flex", md: "none" }}}>
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            <IconButton
+              onClick={() => dispatch(openChat())}
+              sx={{ display: { xs: "flex", md: "none" } }}
+            >
               <ArrowBackRoundedIcon />
             </IconButton>
-            <Box sx={{display:'flex',alignItems:'center', gap: 1,}}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Avatar
-                sx={{bgcolor:stringToColor(`${enemyUser?.displayName}`)}}
+                sx={{ bgcolor: stringToColor(`${enemyUser?.displayName}`) }}
                 src={`${enemyUser?.photoURL}`}
                 alt={`${enemyUser?.displayName}`}
               />
@@ -103,7 +100,7 @@ const Chat = () => {
           {messages.map((m: IMessage) => (
             <Message
               enemyUser={enemyUser}
-              user={currentUser}
+              user={auth.currentUser}
               key={m.id}
               message={m}
             />
@@ -120,7 +117,7 @@ const Chat = () => {
           position: "relative",
           flex: "3",
           height: "100%",
-          display:{xs:open, md:'flex'},
+          display: { xs: open, md: "flex" },
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",

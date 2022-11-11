@@ -1,17 +1,17 @@
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { Box, Button, Input, TextField, Card } from "@mui/material";
+import { Box, Button, Card, TextField } from "@mui/material";
 import {
   arrayUnion,
   doc,
   serverTimestamp,
   Timestamp,
-  updateDoc,
+  updateDoc
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { ChangeEvent, useState, useRef } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import uuid from "react-uuid";
-import { db, storage } from "../../firebase/firebase";
+import { auth, db, storage } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
 
 const InputMessage = () => {
@@ -19,7 +19,6 @@ const InputMessage = () => {
   const [img, setImg] = useState<File | null>();
   const imgRef = useRef<HTMLInputElement>(null);
 
-  const { currentUser } = useAppSelector((state) => state.user);
   const { chatId, enemyUser } = useAppSelector((state) => state.chat);
 
   const onSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
@@ -31,52 +30,51 @@ const InputMessage = () => {
   };
 
   const handleSend = async () => {
-      if (currentUser && enemyUser) {
-        if (img) {
-          const storageRef = ref(storage, uuid());
-          await uploadBytesResumable(storageRef, img);
-          const downloadURL = await getDownloadURL(storageRef);
-          await updateDoc(doc(db, "chats", chatId), {
-            messages: arrayUnion({
-              id: uuid(),
-              text,
-              senderId: currentUser.uid,
-              date: Timestamp.now(),
-              img: downloadURL,
-            }),
-          });
-        } else {
-          await updateDoc(doc(db, "chats", chatId), {
-            messages: arrayUnion({
-              id: uuid(),
-              text,
-              senderId: currentUser?.uid,
-              date: Timestamp.now(),
-            }),
-          });
-        }
-
-        await updateDoc(doc(db, "userChats", currentUser.uid), {
-          [chatId + ".lastMessage"]: {
+    if (auth.currentUser && enemyUser) {
+      if (img) {
+        const storageRef = ref(storage, uuid());
+        await uploadBytesResumable(storageRef, img);
+        const downloadURL = await getDownloadURL(storageRef);
+        await updateDoc(doc(db, "chats", chatId), {
+          messages: arrayUnion({
+            id: uuid(),
             text,
-          },
-          [chatId + ".date"]: serverTimestamp(),
+            senderId: auth.currentUser.uid,
+            date: Timestamp.now(),
+            img: downloadURL,
+          }),
         });
-
-        await updateDoc(doc(db, "userChats", enemyUser.uid), {
-          [chatId + ".lastMessage"]: {
+      } else {
+        await updateDoc(doc(db, "chats", chatId), {
+          messages: arrayUnion({
+            id: uuid(),
             text,
-          },
-          [chatId + ".date"]: serverTimestamp(),
+            senderId: auth.currentUser.uid,
+            date: Timestamp.now(),
+          }),
         });
+      }
 
-        setText("");
-        setImg(null);
-        if (imgRef.current) {
-          imgRef.current.value = "";
-          console.log(imgRef.current.files);
-        }
-      
+      await updateDoc(doc(db, "userChats", auth.currentUser.uid), {
+        [chatId + ".lastMessage"]: {
+          text,
+        },
+        [chatId + ".date"]: serverTimestamp(),
+      });
+
+      await updateDoc(doc(db, "userChats", enemyUser.uid), {
+        [chatId + ".lastMessage"]: {
+          text,
+        },
+        [chatId + ".date"]: serverTimestamp(),
+      });
+
+      setText("");
+      setImg(null);
+      if (imgRef.current) {
+        imgRef.current.value = "";
+        console.log(imgRef.current.files);
+      }
     }
   };
 

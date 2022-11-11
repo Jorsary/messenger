@@ -1,8 +1,5 @@
 import {
-  configureStore,
-  combineReducers,
-  ThunkAction,
-  Action,
+  Action, combineReducers, configureStore, ThunkAction
 } from "@reduxjs/toolkit";
 import chatReducer from "./chatSlice";
 import themeReducer from "./themeSlice";
@@ -11,7 +8,7 @@ import userReducer from "./userSlice";
 const rootReducer = combineReducers({
   user: userReducer,
   theme: themeReducer,
-  chat: chatReducer
+  chat: chatReducer,
 });
 
 export const store = configureStore({

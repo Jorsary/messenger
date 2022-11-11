@@ -8,5 +8,3 @@ export interface SettingsLinks {
   title: string;
   path: string;
 }
-
-

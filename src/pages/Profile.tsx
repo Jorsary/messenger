@@ -1,44 +1,36 @@
-import { Avatar, Popover, Typography } from "@mui/material";
-import { Box, Container } from "@mui/system";
-import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Avatar, Typography } from "@mui/material";
+import { Box } from "@mui/system";
+import { Navigate } from "react-router-dom";
 import Wrapper from "../components/layout/Wrapper";
-import Modal from "../components/Modal";
 import { useAppSelector } from "../hooks/redux-hooks";
+import stringToColor from "../utlis/stringToColor";
 
 const Profile = () => {
-  const { currentUser } = useAppSelector((state) => state.user);
+  const { displayName, photoURL } = useAppSelector((state) => state.user);
 
-
-
-  if(currentUser?.displayName){return (
-    <Wrapper>
-      <Box sx={{
-        width:'100%',
-        display:'flex',
-        alignItems:'center',
-        flexDirection:'column'
-      }}>
-        <Avatar
-          sx={{
-            maxWidth: 250,
-            maxHeight: 250,
-            background: "white",
-            width: "50vw",
-            height: "50vw",
-          }}
-          alt={`${currentUser?.displayName}`}
-          src={`${currentUser?.photoURL}`}
-        />
-        
+  if (displayName) {
+    return (
+      <Wrapper>
         <Box
           sx={{
+            width: "100%",
             display: "flex",
+            alignItems: "center",
             flexDirection: "column",
-            gap: 2,
-            mt: 1,
           }}
         >
+          <Avatar
+            sx={{
+              maxWidth: 250,
+              maxHeight: 250,
+              background: "white",
+              width: "50vw",
+              height: "50vw",
+              bgcolor: stringToColor(`${displayName}`),
+            }}
+            alt={`${displayName}`}
+            src={`${photoURL}`}
+          />
           <Typography
             sx={{
               fontFamily: "monospace",
@@ -48,13 +40,13 @@ const Profile = () => {
               textDecoration: "none",
             }}
           >
-            {currentUser?.displayName}
+            {displayName}
           </Typography>
         </Box>
-      </Box>
-    </Wrapper>
-  );}else{
-    return <Navigate to="/settings" replace={true} />
+      </Wrapper>
+    );
+  } else {
+    return <Navigate to="/settings" replace />;
   }
 };
 

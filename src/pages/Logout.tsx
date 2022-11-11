@@ -9,8 +9,8 @@ const Logout = () => {
 
   signOut(auth);
   dispatch(removeUser);
-  dispatch(changeUser({u:null,res:''}))
-  return (<></>)
+  dispatch(changeUser({ u: null, res: "" }));
+  return <></>;
 };
 
 export default Logout;
