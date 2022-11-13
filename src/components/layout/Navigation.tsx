@@ -37,68 +37,20 @@ const Navigation = ({ links }: NavigationProps) => {
   return (
     <>
       {auth.currentUser && (
-        <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-          <IconButton
-            size="large"
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={handleOpenNavMenu}
-            color="inherit"
-          >
-            <MenuIcon />
-          </IconButton>
-          <Menu
-            id="menu-appbar"
-            anchorEl={anchorElNav}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-            open={Boolean(anchorElNav)}
-            onClose={handleCloseNavMenu}
-            sx={{
-              display: { xs: "block", md: "none" },
-            }}
-          >
-            {links
-              .filter((page) => !page.auth || displayName)
-              .map((page) => (
-                <MenuItem
-                  key={page.title}
-                  onClick={() => handleFollowToLink(page.path)}
-                >
-                  <Typography sx={{display:'flex',alignItems:'center'}} textAlign="center">{page.icon}{page.title}</Typography>
-                </MenuItem>
-              ))}
-          </Menu>
+        <Box sx={{ display: { xs: "flex", md: "none" } }}>
+          {links
+          .filter((page) => !page.auth || displayName)
+          .map((page) => (
+            <MenuItem
+              key={page.title}
+              onClick={() => handleFollowToLink(page.path)}
+            >
+              <Typography sx={{display:'flex',alignItems:'center'}} textAlign="center">{page.icon}</Typography>
+            </MenuItem>
+          ))}
         </Box>
       )}
-      <Typography
-        variant="h5"
-        noWrap
-        component="a"
-        href=""
-        sx={{
-          mr: "-32px",
-          display: { xs: "flex", md: "none" },
-          flexGrow: 1,
-          fontSize: 15,
-          fontFamily: "monospace",
-          fontWeight: 700,
-          letterSpacing: ".2rem",
-          color: "inherit",
-          textDecoration: "none",
-        }}
-      >
-        <SendRoundedIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-        messenger
-      </Typography>
+      
       <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
         <Typography
           variant="h6"

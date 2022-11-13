@@ -129,7 +129,6 @@ const UserSettings = () => {
                           ? `Ваш текущий ник ${displayName}`
                           : "Введите никнейм"
                       }
-                      autoFocus
                       {...register("nickname", {
                         required: "Поле не может быть пустым",
                         minLength: {

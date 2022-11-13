@@ -3,11 +3,14 @@ import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
 import {
   AppBar,
   Avatar,
-  Box, IconButton, Toolbar,
-  Typography
+  Box,
+  IconButton,
+  Toolbar,
+  Typography,
 } from "@mui/material";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { openChat } from "../../store/chatSlice";
@@ -47,6 +50,10 @@ const Chat = () => {
     }
   }, [messages]);
 
+  const push = useNavigate()
+  const goBack = () => push(-1)
+
+
   const open = chatOpened ? "none" : "block";
   if (enemyUser)
     return (
@@ -55,8 +62,8 @@ const Chat = () => {
           padding: { xs: 0, md: 1 },
           position: "relative",
           flex: "3",
-          maxHeight: "90vh",
           display: open,
+          height: { xs: "90vh", md: "85vh" },
         }}
       >
         <AppBar
@@ -68,7 +75,10 @@ const Chat = () => {
         >
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton
-              onClick={() => dispatch(openChat())}
+              onClick={() => {
+                goBack()
+                dispatch(openChat());
+              }}
               sx={{ display: { xs: "flex", md: "none" } }}
             >
               <ArrowBackRoundedIcon />
@@ -85,6 +95,7 @@ const Chat = () => {
         </AppBar>
         <Box
           sx={{
+            position: "relative",
             padding: 1,
             display: "flex",
             flexDirection: "column",
@@ -97,15 +108,20 @@ const Chat = () => {
           position="relative"
           ref={chatRef}
         >
-          {messages.map((m: IMessage) => (
-            <Message
-              enemyUser={enemyUser}
-              user={auth.currentUser}
-              key={m.id}
-              message={m}
-            />
-          ))}
+          <>
+            {messages.map((m: IMessage) => (
+              <>
+                <Message
+                  enemyUser={enemyUser}
+                  user={auth.currentUser}
+                  key={m.id}
+                  message={m}
+                />
+              </>
+            ))}
+          </>
         </Box>
+
         <InputMessage />
       </Box>
     );

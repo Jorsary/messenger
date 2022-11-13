@@ -1,15 +1,15 @@
 import { Avatar, Box, Card, Typography } from "@mui/material";
 import { getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { changeUser } from "../../store/chatSlice";
 import stringToColor from "../../utlis/stringToColor";
 
 const UserChat = ({ info }: any) => {
-  const { photoURL, displayName } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-
+  const push = useNavigate()
   const handleSelectChat = (u: any) => {
     if (auth.currentUser) {
       const res =
@@ -18,59 +18,60 @@ const UserChat = ({ info }: any) => {
           : u.uid + auth.currentUser.uid;
       dispatch(changeUser({ u, res }));
     }
+    push(`/messenger/${userInfo.displayName}`)
   };
 
   const [userInfo, setUserInfo] = useState<any>({});
-  const asfnc = async () => {
+  const getUserInfo = async () => {
     const res: any = await getDoc(info.userInfo.userRef);
     setUserInfo(res.data());
   };
   useEffect(() => {
-    asfnc();
+    getUserInfo();
   }, [info]);
 
   return (
-    <Card
-      onClick={() => handleSelectChat(userInfo)}
-      sx={{
-        minHeight: 64,
-        px: 2,
-        py: 1,
-        display: "flex",
-        alignItems: "center",
-        gap: 1,
-        cursor: "pointer",
-        boxShadow: 0,
-        transition: "all .2s ease-in-out",
-        "&:hover": {
-          transform: "translateY(-1px)",
-          boxShadow: 6,
-        },
-      }}
-    >
-      <Avatar
+      <Card
+        onClick={() => handleSelectChat(userInfo)}
         sx={{
-          bgcolor: stringToColor(`${displayName}`),
+          minHeight: 64,
+          px: 2,
+          py: 1,
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          cursor: "pointer",
+          boxShadow: 0,
+          transition: "all .2s ease-in-out",
+          "&:hover": {
+            transform: "translateY(-1px)",
+            boxShadow: 6,
+          },
         }}
-        src={`${userInfo.photoURL}`}
-        alt={userInfo.displayName}
-      />
-      <Box>
-        <Typography variant="body1">{userInfo.displayName}</Typography>
-        <Typography
-          color="text.disabled"
-          variant="body1"
+      >
+        <Avatar
           sx={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            maxWidth: "130px",
+            bgcolor: stringToColor(`${userInfo.displayName}`),
           }}
-        >
-          {info.lastMessage ? info.lastMessage.text : ""}
-        </Typography>
-      </Box>
-    </Card>
+          src={`${userInfo.photoURL}`}
+          alt={userInfo.displayName}
+        />
+        <Box>
+          <Typography variant="body1">{userInfo.displayName}</Typography>
+          <Typography
+            color="text.disabled"
+            variant="body1"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "130px",
+            }}
+          >
+            {info.lastMessage ? info.lastMessage.text : ""}
+          </Typography>
+        </Box>
+      </Card>
   );
 };
 

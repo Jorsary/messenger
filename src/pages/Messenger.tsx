@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import Wrapper from "../components/layout/Wrapper";
 import Chat from "../components/messenger/Chat";
 import Chats from "../components/messenger/Chats";

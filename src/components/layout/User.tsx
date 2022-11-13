@@ -3,6 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
+import { Box } from "@mui/system";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/firebase";
@@ -36,14 +37,13 @@ const User = ({ settings }: UserProps) => {
   return (
     <>
       {auth.currentUser && (
-        <>
+        <Box sx={{ display: { xs: "none", md: "block" } }}>
           <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, gap: 1 }}>
             <Avatar
               alt={`${displayName}`}
               src={`${photoURL}`}
               sx={{ bgcolor: stringToColor(`${displayName}`) }}
             />
-            
           </IconButton>
           <Menu
             sx={{ mt: "45px" }}
@@ -66,12 +66,33 @@ const User = ({ settings }: UserProps) => {
                 key={setting.title}
                 onClick={() => handleFollowToLink(setting.path)}
               >
-                <Typography sx={{display:'flex',alignItems:'center'}} textAlign="center">{setting.icon}{setting.title}</Typography>
+                <Typography
+                  sx={{ display: "flex", alignItems: "center" }}
+                  textAlign="center"
+                >
+                  {setting.icon}
+                  {setting.title}
+                </Typography>
               </MenuItem>
             ))}
           </Menu>
-        </>
+        </Box>
       )}
+      <Box sx={{ display: { xs: "flex", md: "none" } }}>
+        {settings.map((setting) => (
+          <MenuItem
+            key={setting.title}
+            onClick={() => handleFollowToLink(setting.path)}
+          >
+            <Typography
+              sx={{ display: "flex", alignItems: "center" }}
+              textAlign="center"
+            >
+              {setting.icon}
+            </Typography>
+          </MenuItem>
+        ))}
+      </Box>
     </>
   );
 };
