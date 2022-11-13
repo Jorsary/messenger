@@ -10,6 +10,8 @@ import { auth } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import { SettingsLinks } from "../../models";
 import stringToColor from "../../utlis/stringToColor";
+import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import Logo from "./Logo";
 
 interface UserProps {
   settings: SettingsLinks[];
@@ -78,21 +80,25 @@ const User = ({ settings }: UserProps) => {
           </Menu>
         </Box>
       )}
-      <Box sx={{ display: { xs: "flex", md: "none" } }}>
-        {settings.map((setting) => (
-          <MenuItem
-            key={setting.title}
-            onClick={() => handleFollowToLink(setting.path)}
-          >
-            <Typography
-              sx={{ display: "flex", alignItems: "center" }}
-              textAlign="center"
+      {auth.currentUser ? (
+        <Box sx={{ display: { xs: "flex", md: "none" } }}>
+          {settings.map((setting) => (
+            <MenuItem
+              key={setting.title}
+              onClick={() => handleFollowToLink(setting.path)}
             >
-              {setting.icon}
-            </Typography>
-          </MenuItem>
-        ))}
-      </Box>
+              <Typography
+                sx={{ display: "flex", alignItems: "center" }}
+                textAlign="center"
+              >
+                {setting.icon}
+              </Typography>
+            </MenuItem>
+          ))}
+        </Box>
+      ) : (
+        <Logo />
+      )}
     </>
   );
 };

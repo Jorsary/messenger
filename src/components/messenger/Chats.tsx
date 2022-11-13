@@ -1,19 +1,18 @@
 import { Box } from "@mui/material";
 import { doc, DocumentData, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { auth, db } from "../../firebase/firebase";
+import { db } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import Search from "./Search";
 import UserChat from "./UserChat";
 
-const Chats = () => {
-  const { chatOpened } = useAppSelector((state) => state.chat);
+const Chats = ({id}:any) => {
   const [chats, setChats] = useState<DocumentData>({});
   const { uid } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (auth.currentUser) {
+    if (uid) {
       const getChats = () => {
         const unsub = onSnapshot(doc(db, "userChats", uid), (doc) => {
           setChats(doc.data() || {});
@@ -24,11 +23,11 @@ const Chats = () => {
         };
       };
 
-      auth.currentUser.uid && getChats();
+      uid && getChats();
     }
-  }, [auth.currentUser]);
+  }, [uid]);
 
-  const open = chatOpened ? "flex" : "none";
+  const open = !id ? "flex" : "none";
   return (
     <Box
       sx={{

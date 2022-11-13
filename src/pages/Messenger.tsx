@@ -4,10 +4,11 @@ import Chat from "../components/messenger/Chat";
 import Chats from "../components/messenger/Chats";
 
 const Messenger = () => {
+const {id} = useParams()
   return (
     <Wrapper>
-      <Chats />
-      <Chat />
+      <Chats id={id}/>
+      <Chat  id={id}/>
     </Wrapper>
   );
 };

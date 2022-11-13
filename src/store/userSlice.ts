@@ -9,7 +9,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  loadingUser: false,
+  loadingUser: true,
   error: undefined,
   displayName: "",
   photoURL: null,

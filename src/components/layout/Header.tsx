@@ -1,8 +1,11 @@
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
-import Toolbar from "@mui/material/Toolbar";
+import {
+  AppBar,
+  Typography,
+  Box,
+  Container,
+  IconButton,
+  Toolbar,
+} from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { NavLinks } from "../../models";
 import { setTheme } from "../../store/themeSlice";
@@ -13,6 +16,8 @@ import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import Brightness4RoundedIcon from "@mui/icons-material/Brightness4Rounded";
 import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
+import { useParams } from "react-router-dom";
+import Logo from "./Logo";
 
 const links: NavLinks[] = [
   {
@@ -42,19 +47,26 @@ const settings = [
 
 const Header = () => {
   const dispatch = useAppDispatch();
-  const { chatOpened } = useAppSelector((state) => state.chat);
+  const { id } = useParams();
   return (
     <AppBar
       sx={{
         position: { xs: "fixed", md: "static" },
         top: "auto",
         bottom: 0,
-        display: { xs: chatOpened ? "block" : "none", md: "block" },
+        display: { xs: !id ? "block" : "none", md: "block" },
       }}
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ display: "flex" }}>
-          <Box sx={{ display: "flex", margin: "0 auto",justifyContent:'space-between',width:'100%' }}>
+          <Box
+            sx={{
+              display: "flex",
+              margin: "0 auto",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
             <Navigation links={links} />
             <User settings={settings} />
             <IconButton onClick={() => dispatch(setTheme())}>

@@ -1,4 +1,10 @@
-import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import {
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+  Backdrop,
+  CircularProgress,
+} from "@mui/material";
 import { browserLocalPersistence, setPersistence } from "firebase/auth";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -15,7 +21,6 @@ import Profile from "./pages/Profile";
 import UserSettings from "./pages/ProfileSettings";
 import SignIn from "./pages/SignIn";
 import { setUser, setUserInfo } from "./store/userSlice";
-import SendRoundedIcon from "@mui/icons-material/SendRounded";
 
 export const darkTheme = createTheme({
   palette: {
@@ -41,27 +46,34 @@ function App() {
     dispatch(setUserInfo({ ...user }));
   }, [user, loading, error]);
 
-  useEffect(() => {
-    setPersistence(auth, browserLocalPersistence);
-  }, []);
+  const { loadingUser } = useAppSelector((state) => state.user);
 
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : ligthTheme}>
       <CssBaseline />
-      <Routes>
-        <Route element={<Layout />}>
-          <Route element={<PrivateOutlet isAuth={user} />}>
-            <Route path="/" element={<Profile />}></Route>
-            <Route path="/messenger/" element={<Messenger />}></Route>
-            <Route path="/messenger/:id" element={<Messenger />}></Route>
-            <Route path="/logout" element={<Logout />}></Route>
-            <Route path="/settings" element={<UserSettings />}></Route>
+      {loadingUser ? (
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={loading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      ) : (
+        <Routes>
+          <Route element={<Layout />}>
+            <Route element={<PrivateOutlet isAuth={user} />}>
+              <Route path="/" element={<Profile />}></Route>
+              <Route path="/messenger/" element={<Messenger />}></Route>
+              <Route path="/messenger/:id" element={<Messenger />}></Route>
+              <Route path="/logout" element={<Logout />}></Route>
+              <Route path="/settings" element={<UserSettings />}></Route>
+            </Route>
+            <Route path="signin" element={<SignIn />}></Route>
+            <Route path="*" element={<NotFound />}></Route>
           </Route>
-          <Route path="signin" element={<SignIn />}></Route>
-          <Route path="*" element={<NotFound />}></Route>
-        </Route>
-      </Routes>
+        </Routes>
+      )}
     </ThemeProvider>
   );
 }

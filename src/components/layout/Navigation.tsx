@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import { NavLinks } from "../../models";
+import Logo from "./Logo";
 
 interface NavigationProps {
   links: NavLinks[];
@@ -38,42 +39,26 @@ const Navigation = ({ links }: NavigationProps) => {
     <>
       {auth.currentUser && (
         <Box sx={{ display: { xs: "flex", md: "none" } }}>
+          
           {links
-          .filter((page) => !page.auth || displayName)
-          .map((page) => (
-            <MenuItem
-              key={page.title}
-              onClick={() => handleFollowToLink(page.path)}
-            >
-              <Typography sx={{display:'flex',alignItems:'center'}} textAlign="center">{page.icon}</Typography>
-            </MenuItem>
-          ))}
+            .filter((page) => !page.auth || displayName)
+            .map((page) => (
+              <MenuItem
+                key={page.title}
+                onClick={() => handleFollowToLink(page.path)}
+              >
+                <Typography
+                  sx={{ display: "flex", alignItems: "center" }}
+                  textAlign="center"
+                >
+                  {page.icon}
+                </Typography>
+              </MenuItem>
+            ))}
         </Box>
       )}
-      
-      <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-        <Typography
-          variant="h6"
-          noWrap
-          component="a"
-          onClick={() => push("/")}
-          sx={{
-            mr: 2,
-            display: { xs: "none", md: "flex" },
-            alignItems: "center",
-            fontFamily: "monospace",
-            fontWeight: 700,
-            letterSpacing: ".3rem",
-            color: "inherit",
-            textDecoration: "none",
-            cursor: "pointer",
-          }}
-        >
-          <SendRoundedIcon
-            sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
-          />
-          messenger
-        </Typography>
+       <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+       <Logo/>
         {links
           .filter((page) => !page.auth || displayName)
           .map((page) => (
@@ -81,10 +66,16 @@ const Navigation = ({ links }: NavigationProps) => {
               key={page.title}
               onClick={() => handleFollowToLink(page.path)}
             >
-              <Typography sx={{display:'flex',alignItems:'center'}} textAlign="center">{page.icon}{page.title}</Typography>
+              <Typography
+                sx={{ display: "flex", alignItems: "center" }}
+                textAlign="center"
+              >
+                {page.icon}
+                {page.title}
+              </Typography>
             </MenuItem>
           ))}
-      </Box>
+      </Box> 
     </>
   );
 };

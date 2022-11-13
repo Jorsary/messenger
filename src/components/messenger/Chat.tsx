@@ -13,7 +13,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
-import { openChat } from "../../store/chatSlice";
 import stringToColor from "../../utlis/stringToColor";
 import InputMessage from "./InputMessage";
 import Message from "./Message";
@@ -24,8 +23,8 @@ export interface IMessage {
   text: string;
 }
 
-const Chat = () => {
-  const { chatId, enemyUser, chatOpened } = useAppSelector(
+const Chat = ({id}:any) => {
+  const { chatId, enemyUser } = useAppSelector(
     (state) => state.chat
   );
   const chatRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +53,7 @@ const Chat = () => {
   const goBack = () => push(-1)
 
 
-  const open = chatOpened ? "none" : "block";
+  const open = !id ? "none" : "block";
   if (enemyUser)
     return (
       <Box
@@ -77,7 +76,6 @@ const Chat = () => {
             <IconButton
               onClick={() => {
                 goBack()
-                dispatch(openChat());
               }}
               sx={{ display: { xs: "flex", md: "none" } }}
             >
