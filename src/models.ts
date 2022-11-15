@@ -1,3 +1,12 @@
+import { ConfirmationResult, RecaptchaVerifier } from "firebase/auth";
+
+declare global {
+  interface Window {
+    recaptchaVerifier: RecaptchaVerifier;
+    confirmationResult: ConfirmationResult;
+  }
+}
+
 export interface NavLinks {
   icon?: JSX.Element;
   title: string;
@@ -10,3 +19,10 @@ export interface SettingsLinks {
   title: string;
   path: string;
 }
+
+export interface IAuthForm {
+  phone: any;
+  password: string;
+  otp: string;
+}
+

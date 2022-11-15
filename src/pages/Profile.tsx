@@ -7,7 +7,6 @@ import stringToColor from "../utlis/stringToColor";
 
 const Profile = () => {
   const { displayName, photoURL } = useAppSelector((state) => state.user);
-  console.log(displayName)
   if (displayName) {
     return (
       <Wrapper>

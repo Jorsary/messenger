@@ -62,7 +62,7 @@ const Chat = ({id}:any) => {
           position: "relative",
           flex: "3",
           display: open,
-          height: { xs: "90vh", md: "85vh" },
+          height: { xs: "97vh", md: "85vh" },
         }}
       >
         <AppBar

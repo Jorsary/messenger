@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
 import { setUserInfo } from "../store/userSlice";
 
 const Modal = ({ setLoading, onClose }: any) => {
-  const { displayName, photoURL } = useAppSelector((state) => state.user);
+  const { displayName } = useAppSelector((state) => state.user);
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
   const [preview, setPreview] = useState<undefined | string>();
   const dispatch = useAppDispatch();

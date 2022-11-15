@@ -1,33 +1,25 @@
-import {
-  AppBar,
-  Typography,
-  Box,
-  Container,
-  IconButton,
-  Toolbar,
-} from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
-import { NavLinks } from "../../models";
+import Brightness4RoundedIcon from "@mui/icons-material/Brightness4Rounded";
+import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import { AppBar, Box, Container, IconButton, Toolbar } from "@mui/material";
+import { useParams } from "react-router-dom";
+import { useAppDispatch } from "../../hooks/redux-hooks";
+import { NavLinks, SettingsLinks } from "../../models";
 import { setTheme } from "../../store/themeSlice";
 import Navigation from "./Navigation";
 import User from "./User";
-import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
-import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import Brightness4RoundedIcon from "@mui/icons-material/Brightness4Rounded";
-import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
-import { useParams } from "react-router-dom";
-import Logo from "./Logo";
 
 const links: NavLinks[] = [
   {
     icon: <ForumRoundedIcon />,
-    title: "Мессенджер",
+    title: "Сообщения",
     auth: true,
     path: "/messenger",
   },
 ];
-const settings = [
+const settings: SettingsLinks[] = [
   {
     icon: <PersonRoundedIcon />,
     title: "Профиль",
