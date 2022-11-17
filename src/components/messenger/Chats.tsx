@@ -27,12 +27,10 @@ const Chats = ({id}:any) => {
     }
   }, [uid]);
 
-  const open = !id ? "flex" : "none";
   return (
     <Box
       sx={{
-        display: { xs: open, md: "flex" },
-        // display: 'flex',
+        display: { xs:  !id ? "flex" : "none", md: "flex" },
         flexDirection: "column",
         gap: 1,
         overflowY: "auto",

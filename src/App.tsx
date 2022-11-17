@@ -20,7 +20,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import UserSettings from "./pages/ProfileSettings";
 import SignIn from "./pages/SignIn";
-import { setUser, setUserInfo } from "./store/userSlice";
+import { setLoading, setUserInfo } from "./store/userSlice";
 
 export const darkTheme = createTheme({
   palette: {
@@ -42,7 +42,7 @@ function App() {
   const [user, loading, error] = useAuthState(auth);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(setUser({ user, loading, error }));
+    dispatch(setLoading({loading, error }));
     dispatch(setUserInfo({ ...user }));
   }, [user, loading, error]);
 
@@ -55,7 +55,7 @@ function App() {
       {loadingUser ? (
         <Backdrop
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={loading}
+          open={true}
         >
           <CircularProgress color="inherit" />
         </Backdrop>

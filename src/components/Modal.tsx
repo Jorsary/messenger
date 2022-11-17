@@ -4,7 +4,7 @@ import {
   Button,
   Container,
   Input,
-  Typography
+  Typography,
 } from "@mui/material";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
@@ -12,9 +12,9 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { ChangeEvent, useEffect, useState } from "react";
 import { auth, db, storage } from "../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
-import { setUserInfo } from "../store/userSlice";
+import { setUserInfo,setLoading } from "../store/userSlice";
 
-const Modal = ({ setLoading, onClose }: any) => {
+const Modal = ({ onClose }: any) => {
   const { displayName } = useAppSelector((state) => state.user);
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
   const [preview, setPreview] = useState<undefined | string>();
@@ -41,7 +41,7 @@ const Modal = ({ setLoading, onClose }: any) => {
 
   const handleChangeAvatar = async (e: any) => {
     e.preventDefault();
-    setLoading(true);
+    dispatch(setLoading({loading:true, error:undefined}))
     if (auth.currentUser && displayName && selectedFile) {
       const date = new Date().getTime();
       const storageRef = ref(storage, `${displayName + date}`);
@@ -55,7 +55,7 @@ const Modal = ({ setLoading, onClose }: any) => {
         photoURL: downloadURL,
       });
       dispatch(setUserInfo({ ...auth.currentUser }));
-      setLoading(false);
+      dispatch(setLoading({loading:false, error:undefined}))
       onClose();
     }
   };
@@ -86,15 +86,10 @@ const Modal = ({ setLoading, onClose }: any) => {
             Выбрать фото
           </Button>
         </label>
-        {selectedFile ? (
-          <Avatar
-            sx={{ width: 100, height: 100, bgcolor: "white" }}
-            src={preview}
-          />
-        ) : (
-          <Avatar sx={{ width: 100, height: 100 }} />
-        )}
-
+        <Avatar
+          sx={{ width: 100, height: 100 }}
+          src={selectedFile ? preview : ""}
+        />
         <Button type="submit" fullWidth variant="contained">
           Изменить
         </Button>

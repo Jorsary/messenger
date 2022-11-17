@@ -15,31 +15,36 @@ const Navigation = ({ links }: NavigationProps) => {
 
   return (
     <>
-      {auth.currentUser && (
-        <Box sx={{ display: { xs: "flex", md: "none" } }}>
-          {links
-            .filter((page) => !page.auth || displayName)
-            .map((page) => (
-              <MenuItem
-                key={page.title}
+      <Logo bool={!auth.currentUser} />
+      <Box
+        sx={{ display: { xs: auth.currentUser ? "flex" : "none", md: "none" } }}
+      >
+        {links
+          .filter((page) => !page.auth || displayName)
+          .map((page) => (
+            <MenuItem key={page.title}>
+              <NavLink
+                color="#fffff"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  textDecoration: "none",
+                  color: "white",
+                }}
+                to={page.path}
               >
-                <NavLink
-                  color="#fffff"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    textDecoration: "none",
-                    color: "white",
-                  }}
-                  to={page.path}
-                >
-                  {page.icon}
-                </NavLink>
-              </MenuItem>
-            ))}
-        </Box>
-      )}
-      <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "flex" } }}>
+                {page.icon}
+              </NavLink>
+            </MenuItem>
+          ))}
+      </Box>
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: { xs: "none", md: auth.currentUser ? "flex" : "none" },
+        }}
+      >
+        <Logo bool={true} />
         {links
           .filter((page) => !page.auth || displayName)
           .map((page) => (

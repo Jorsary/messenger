@@ -16,7 +16,7 @@ import Loader from "../components/Loader";
 import Modal from "../components/Modal";
 import { auth, db } from "../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
-import { setUserInfo } from "../store/userSlice";
+import { setLoading, setUserInfo } from "../store/userSlice";
 import stringToColor from "../utlis/stringToColor";
 
 interface ISettingsForm {
@@ -26,7 +26,6 @@ interface ISettingsForm {
 const UserSettings = () => {
   const { displayName, photoURL } = useAppSelector((state) => state.user);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [load, setLoad] = useState(false);
   const dispatch = useAppDispatch();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -50,14 +49,14 @@ const UserSettings = () => {
   });
 
   const handleUpdateProfile = async (data: any) => {
-    setLoad(true);
+    dispatch(setLoading({loading:true, error:undefined}))
     try {
       if (auth.currentUser) {
         await updateProfile(auth.currentUser, { displayName: data.nickname });
         await updateDoc(doc(db, "users", auth.currentUser.uid), {
           displayName: data.nickname,
         });
-        setLoad(false);
+        dispatch(setLoading({loading:false, error:undefined}))
         dispatch(setUserInfo({ ...auth.currentUser }));
       }
     } catch (err) {
@@ -74,7 +73,6 @@ const UserSettings = () => {
           flexDirection: "column",
         }}
       >
-        {!load ? (
           <>
             <Avatar
               aria-describedby={id}
@@ -164,12 +162,9 @@ const UserSettings = () => {
                 horizontal: "left",
               }}
             >
-              <Modal setLoading={setLoad} onClose={handleClose} />
+              <Modal onClose={handleClose} />
             </Popover>
           </>
-        ) : (
-          <Loader />
-        )}
       </Box>
     </Wrapper>
   );

@@ -8,7 +8,7 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
-  where
+  where,
 } from "firebase/firestore";
 import { useState } from "react";
 import { auth, db } from "../../firebase/firebase";
@@ -21,7 +21,7 @@ const Search = () => {
   const handleSearch = async () => {
     const q = query(
       collection(db, "users"),
-      where("displayName", "==", userAName),
+      where("displayName", "==", userAName)
     );
 
     try {
@@ -33,7 +33,6 @@ const Search = () => {
     } catch (err) {
       setErr(true);
     }
-    console.log(userAnother);
   };
 
   const handleSelect = async () => {
@@ -87,30 +86,29 @@ const Search = () => {
           setUserAName(e.target.value);
         }}
       />
-      {userAnother && (
-        <Card
-          onClick={handleSelect}
-          sx={{
-            boxSizing: "border-box",
-            minHeight: 64,
-            px: 2,
-            py: 1,
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            cursor: "pointer",
-            boxShadow: 0,
-            transition: "all .2s ease-in-out",
-            "&:hover": {
-              transform: "translateY(-1px)",
-              boxShadow: 6,
-            },
-          }}
-        >
-          <Avatar src={userAnother.photoURL} alt="" />
-          <Typography>{userAnother.displayName}</Typography>
-        </Card>
-      )}
+
+      <Card
+        onClick={handleSelect}
+        sx={{
+          boxSizing: "border-box",
+          minHeight: 64,
+          px: 2,
+          py: 1,
+          display: userAnother || err ? "flex" : "none",
+          alignItems: "center",
+          gap: 1,
+          cursor: "pointer",
+          boxShadow: 0,
+          transition: "all .2s ease-in-out",
+          "&:hover": {
+            transform: "translateY(-1px)",
+            boxShadow: 6,
+          },
+        }}
+      >
+        <Avatar src={userAnother?.photoURL} alt="" />
+        <Typography>{userAnother?.displayName}</Typography>
+      </Card>
     </Box>
   );
 };

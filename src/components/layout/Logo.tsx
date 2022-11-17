@@ -2,12 +2,12 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import { Typography } from "@mui/material";
 
 
-const Logo = () => {
+const Logo = ({bool}:{bool:boolean}) => {
   return (
     <Typography
       variant="h6"
       sx={{
-        display: "flex",
+        display: bool ? "flex" : 'none',
         alignItems: "center",
         fontFamily: "monospace",
         fontWeight: 700,

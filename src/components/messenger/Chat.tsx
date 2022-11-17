@@ -23,10 +23,8 @@ export interface IMessage {
   text: string;
 }
 
-const Chat = ({id}:any) => {
-  const { chatId, enemyUser } = useAppSelector(
-    (state) => state.chat
-  );
+const Chat = ({ id }: any) => {
+  const { chatId, enemyUser } = useAppSelector((state) => state.chat);
   const chatRef = useRef<HTMLDivElement | null>(null);
   const [messages, setMessages] = useState<Array<IMessage>>([]);
   const dispatch = useAppDispatch();
@@ -49,100 +47,96 @@ const Chat = ({id}:any) => {
     }
   }, [messages]);
 
-  const push = useNavigate()
-  const goBack = () => push(-1)
+  const push = useNavigate();
+  const goBack = () => push(-1);
 
-
-  const open = !id ? "none" : "block";
-  if (enemyUser)
     return (
-      <Box
-        sx={{
-          padding: { xs: 0, md: 1 },
-          position: "relative",
-          flex: "3",
-          display: open,
-          height: { xs: "97vh", md: "85vh" },
-        }}
-      >
-        <AppBar
-          position="static"
-          sx={{
-            boxShadow: 3,
-            borderRadius: 1,
-          }}
-        >
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-            <IconButton
-              onClick={() => {
-                goBack()
-              }}
-              sx={{ display: { xs: "flex", md: "none" } }}
-            >
-              <ArrowBackRoundedIcon />
-            </IconButton>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Avatar
-                sx={{ bgcolor: stringToColor(`${enemyUser?.displayName}`) }}
-                src={`${enemyUser?.photoURL}`}
-                alt={`${enemyUser?.displayName}`}
-              />
-              <Typography>{enemyUser?.displayName}</Typography>
-            </Box>
-          </Toolbar>
-        </AppBar>
+      <>
         <Box
           sx={{
+            padding: { xs: 0, md: 1 },
             position: "relative",
-            padding: 1,
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
-            overflowY: "auto",
-            scrollBehavior: "smooth",
-            gap: 2,
-            height: "80%",
+            flex: "3",
+            display: id && enemyUser ? "block" : "none",
+            height: { xs: "97vh", md: "85vh" },
           }}
-          position="relative"
-          ref={chatRef}
         >
-          <>
-            {messages.map((m: IMessage) => (
-              <>
-                <Message
-                  enemyUser={enemyUser}
-                  user={auth.currentUser}
-                  key={m.id}
-                  message={m}
+          <AppBar
+            position="static"
+            sx={{
+              boxShadow: 3,
+              borderRadius: 1,
+            }}
+          >
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+              <IconButton
+                onClick={() => {
+                  goBack();
+                }}
+                sx={{ display: { xs: "flex", md: "none" } }}
+              >
+                <ArrowBackRoundedIcon />
+              </IconButton>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Avatar
+                  sx={{ bgcolor: stringToColor(`${enemyUser?.displayName}`) }}
+                  src={`${enemyUser?.photoURL}`}
+                  alt={`${enemyUser?.displayName}`}
                 />
-              </>
-            ))}
-          </>
+                <Typography>{enemyUser?.displayName}</Typography>
+              </Box>
+            </Toolbar>
+          </AppBar>
+          <Box
+            sx={{
+              position: "relative",
+              padding: 1,
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+              overflowY: "auto",
+              scrollBehavior: "smooth",
+              gap: 2,
+              height: "80%",
+            }}
+            position="relative"
+            ref={chatRef}
+          >
+            <>
+              {messages.map((m: IMessage) => (
+                <>
+                  <Message
+                    enemyUser={enemyUser}
+                    key={m.id}
+                    message={m}
+                  />
+                </>
+              ))}
+            </>
+          </Box>
+
+          <InputMessage />
         </Box>
 
-        <InputMessage />
-      </Box>
-    );
-  else
-    return (
-      <Box
-        sx={{
-          padding: 1,
-          position: "relative",
-          flex: "3",
-          height: "100%",
-          display: { xs: open, md: "flex" },
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          fontFamily: "monospace",
-          fontWeight: 700,
-          letterSpacing: ".3rem",
-        }}
-      >
-        <ForumRoundedIcon sx={{ fontSize: "5vw" }} />
-        Выберите чат
-      </Box>
+        <Box
+          sx={{
+            padding: 1,
+            position: "relative",
+            flex: "3",
+            height: "100%",
+            display: { xs: 'none', md: id ?  "none" : 'flex' },
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            fontFamily: "monospace",
+            fontWeight: 700,
+            letterSpacing: ".3rem",
+          }}
+        >
+          <ForumRoundedIcon sx={{ fontSize: "5vw" }} />
+          Выберите чат
+        </Box>
+      </>
     );
 };
 

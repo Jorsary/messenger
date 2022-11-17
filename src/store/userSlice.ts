@@ -20,7 +20,7 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser(state, action: PayloadAction<any>) {
+    setLoading(state, action: PayloadAction<any>) {
       state.loadingUser = action.payload.loading;
       state.error = action.payload.error;
     },
@@ -36,6 +36,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, removeUser, setUserInfo } = userSlice.actions;
+export const { setLoading, removeUser, setUserInfo } = userSlice.actions;
 
 export default userSlice.reducer;

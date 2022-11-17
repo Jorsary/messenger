@@ -38,50 +38,33 @@ const User = ({ settings }: UserProps) => {
 
   return (
     <>
-      {auth.currentUser && (
-        <Box sx={{ display: { xs: "none", md: "block" } }}>
-          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, gap: 1 }}>
-            <Avatar
-              alt={`${displayName}`}
-              src={`${photoURL}`}
-              sx={{ bgcolor: stringToColor(`${displayName}`) }}
-            />
-          </IconButton>
-          <Menu
-            sx={{ mt: "45px" }}
-            id="menu-appbar"
-            anchorEl={anchorElUser}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            open={Boolean(anchorElUser)}
-            onClose={handleCloseUserMenu}
-          >
-            {settings.map((setting) => (
-              <MenuItem
-                key={setting.title}
-                onClick={() => handleFollowToLink(setting.path)}
-              >
-                <Typography
-                  sx={{ display: "flex", alignItems: "center" }}
-                  textAlign="center"
-                >
-                  {setting.icon}
-                  {setting.title}
-                </Typography>
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
-      )}
-      {auth.currentUser ? (
-        <Box sx={{ display: { xs: "flex", md: "none" } }}>
+      <Box
+        sx={{
+          display: { xs: "none", md: auth.currentUser ? "block" : "none" },
+        }}
+      >
+        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, gap: 1 }}>
+          <Avatar
+            src={`${photoURL}`}
+            sx={{ bgcolor: stringToColor(`${displayName}`)}}
+          />
+        </IconButton>
+        <Menu
+          sx={{ mt: "45px" }}
+          id="menu-appbar"
+          anchorEl={anchorElUser}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorElUser)}
+          onClose={handleCloseUserMenu}
+        >
           {settings.map((setting) => (
             <MenuItem
               key={setting.title}
@@ -92,13 +75,29 @@ const User = ({ settings }: UserProps) => {
                 textAlign="center"
               >
                 {setting.icon}
+                {setting.title}
               </Typography>
             </MenuItem>
           ))}
-        </Box>
-      ) : (
-        <Logo />
-      )}
+        </Menu>
+      </Box>
+      <Box
+        sx={{ display: { xs: auth.currentUser ? "flex" : "none", md: "none" } }}
+      >
+        {settings.map((setting) => (
+          <MenuItem
+            key={setting.title}
+            onClick={() => handleFollowToLink(setting.path)}
+          >
+            <Typography
+              sx={{ display: "flex", alignItems: "center" }}
+              textAlign="center"
+            >
+              {setting.icon}
+            </Typography>
+          </MenuItem>
+        ))}
+      </Box>
     </>
   );
 };
