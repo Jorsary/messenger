@@ -1,7 +1,9 @@
 import { Avatar, Box, Card, Typography } from "@mui/material";
-import { User, UserInfo } from "firebase/auth";
+import { UserInfo } from "firebase/auth";
+import { useEffect, useRef, useState } from "react";
 import { auth } from "../../firebase/firebase";
 import stringToColor from "../../utlis/stringToColor";
+import Loader from "../Loader";
 
 interface InfoMessage {
   message: IMessage;
@@ -17,9 +19,17 @@ export interface IMessage {
 }
 
 const Message = ({ message, enemyUser }: InfoMessage) => {
+  const [loaded, setLoaded] = useState(false);
   const senderUser = message.senderId === enemyUser?.uid;
+  const chatRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (chatRef.current) {
+      chatRef.current.scrollIntoView();
+    }
+  }, [message]);
   return (
     <Box
+      ref={chatRef}
       sx={{
         display: auth.currentUser && enemyUser ? "flex" : "none",
         px: 2,
@@ -94,15 +104,28 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
           </Typography>
         </Box>
 
-        <Typography
-          sx={{
-            maxWidth: 400,
-            wordWrap: "break-word",
-          }}
-        >
-          {message.text}
-        </Typography>
-        {message.img && <img src={message.img} alt="" />}
+        {message.text && (
+          <Typography
+            sx={{
+              maxWidth: 400,
+              wordWrap: "break-word",
+            }}
+          >
+            {message.text}
+          </Typography>
+        )}
+        {message.img && (
+          <>
+            <img
+              style={{ display: loaded ? "block" : "none" }}
+              src={message.img}
+              onLoad={() => {
+                setLoaded(true);
+              }}
+            />
+            <Loader height="600px" width="400px" loaded={loaded} />
+          </>
+        )}
       </Card>
     </Box>
   );

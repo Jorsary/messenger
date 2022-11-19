@@ -2,17 +2,20 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 
 interface propType {
-  isLoad: boolean;
+  height?: string | number;
+  width?: string | number;
+  loaded?: boolean
 }
 
-const Loader = () => {
+const Loader = ({height,width,loaded}:propType) => {
   return (
     <Box
       sx={{
-        display: "flex",
+        display: loaded ? 'none' : 'flex',
         alignItems: "center",
         justifyContent: "center",
-        height: "100%",
+        height: height ? height : '100%',
+        width: width
       }}
     >
       <CircularProgress color="secondary" />

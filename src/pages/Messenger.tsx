@@ -8,7 +8,7 @@ const {id} = useParams()
   return (
     <Wrapper>
       <Chats id={id}/>
-      <Chat  id={id}/>
+      <Chat key={id}  id={id}/>
     </Wrapper>
   );
 };
