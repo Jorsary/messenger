@@ -1,7 +1,9 @@
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CloseIcon from "@mui/icons-material/Close";
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { Box, Button, TextField,AppBar } from "@mui/material";
+import { Box, Button, Popover, TextField } from "@mui/material";
+import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import {
   arrayUnion,
   doc,
@@ -30,6 +32,7 @@ const InputMessage = () => {
   const dispatch = useAppDispatch();
 
   const { chatId, enemyUser } = useAppSelector((state) => state.chat);
+  const { darkMode } = useAppSelector((state) => state.theme);
 
   const onSelectFile = async (e: ChangeEvent<HTMLInputElement>) => {
     if (auth.currentUser && e.target.files) {
@@ -48,7 +51,7 @@ const InputMessage = () => {
   const onDeleteFile = () => {
     if (storageRefImg) {
       deleteObject(storageRefImg);
-      setImg('')
+      setImg("");
     }
   };
 
@@ -83,67 +86,113 @@ const InputMessage = () => {
     }
   };
 
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
+
   return (
-    <Box
-      sx={{
-        boxShadow: 3,
-        borderRadius: 2,
-        width: "100%",
-        padding: 2,
-        bgcolor: 'secondary.main'
-      }}
-    >
-      <Box sx={{ display: img ? "flex" : "none",padding:'2px' }}>
-        <img
-          onClick={() => {
-            dispatch(handleOpenImagePopup({ imageLink: img }));
+    <>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+      >
+        <EmojiPicker
+          skinTonesDisabled
+          theme={darkMode ? Theme.DARK : Theme.LIGHT}
+          emojiStyle={EmojiStyle.GOOGLE}
+          onEmojiClick={(e) => {
+            setText(text + e.emoji);
           }}
-          style={{width:'10vh'}}
-          src={img}
         />
-        <CloseIcon onClick={() => onDeleteFile()} sx={{ cursor: "pointer" }} />
-      </Box>
+      </Popover>
 
       <Box
         sx={{
-          display: "flex",
-          gap: 1,
-          alignItems: "center",
-          
-        }}
-        component="form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSend();
+          boxShadow: 3,
+          borderRadius: 2,
+          width: "100%",
+          padding: 2,
+          bgcolor: "secondary.main",
         }}
       >
-        <TextField
-          fullWidth
-          id="message"
-          label="Введите сообщение"
-          name="message"
-          onChange={(e) => setText(e.target.value)}
-          value={text}
-          autoFocus
-          size="small"
-        />
-        <input
-          style={{ display: "none" }}
-          id="raised-button-file"
-          type="file"
-          ref={imgRef}
-          onChange={onSelectFile}
-        />
-        <label htmlFor="raised-button-file">
-          <Button component="span">
-            <AttachFileIcon />
+        <Box sx={{ display: img ? "flex" : "none", padding: "2px" }}>
+          <img
+            onClick={() => {
+              dispatch(handleOpenImagePopup({ imageLink: img }));
+            }}
+            style={{ width: "10vh" }}
+            src={img}
+          />
+          <CloseIcon
+            onClick={() => onDeleteFile()}
+            sx={{ cursor: "pointer" }}
+          />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+          }}
+          component="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+        >
+          <TextField
+            fullWidth
+            id="message"
+            label="Введите сообщение"
+            name="message"
+            onChange={(e) => setText(e.target.value)}
+            value={text}
+            autoFocus
+            size="small"
+            inputProps={{
+              style: { fontFamily: "Noto Color Emoji, sans-serif" },
+            }}
+          />
+
+          <Button
+            onClick={(e) => {
+              handleClick(e);
+            }}
+          >
+            <EmojiEmotionsIcon />
           </Button>
-        </label>
-        <Button disabled={!text && !img} type="submit">
-          <SendRoundedIcon></SendRoundedIcon>
-        </Button>
+          <input
+            style={{ display: "none" }}
+            id="raised-button-file"
+            type="file"
+            ref={imgRef}
+            onChange={onSelectFile}
+          />
+          <label htmlFor="raised-button-file">
+            <Button component="span">
+              <AttachFileIcon />
+            </Button>
+          </label>
+          <Button disabled={!text && !img} type="submit">
+            <SendRoundedIcon></SendRoundedIcon>
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 
