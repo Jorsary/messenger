@@ -114,6 +114,9 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
             sx={{
               maxWidth: 400,
               wordWrap: "break-word",
+              fontFamily: 'Noto Color Emoji, sans-serif',
+              fontSize:16,
+              lineHeight:1
             }}
           >
             {message.text}

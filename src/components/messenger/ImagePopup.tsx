@@ -9,26 +9,25 @@ function ImagePopup() {
   const dispatch = useAppDispatch();
   return (
     <Backdrop
-    
-      sx={{  zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       open={imageIsOpen}
       onClick={() => {
         dispatch(handleCloseImagePopup());
       }}
     >
       <Card>
-        <img
-          style={{ width: "60vw", maxWidth: 600 }}
-          className="popup__image"
-          src={imageLink}
-        />
+        <img style={{ width: "60vw", maxWidth: 600 }} src={imageLink} />
         <CloseIcon
           fontSize={"large"}
           sx={{
-            color:'white',
+            color: "white",
             display: imageIsOpen ? "inline-block" : "none",
             position: "absolute",
             cursor: "pointer",
+            transition: "all .2s ease-in-out",
+            "&:hover": {
+              opacity: 0.6,
+            },
           }}
         />
       </Card>

@@ -2,21 +2,21 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CloseIcon from "@mui/icons-material/Close";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { Box, Button, Popover, TextField } from "@mui/material";
+import { Box, Button, IconButton, Popover, TextField } from "@mui/material";
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import {
   arrayUnion,
   doc,
   serverTimestamp,
   Timestamp,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
 import {
   deleteObject,
   getDownloadURL,
   ref,
   StorageReference,
-  uploadBytesResumable
+  uploadBytesResumable,
 } from "firebase/storage";
 import { ChangeEvent, useRef, useState } from "react";
 import uuid from "react-uuid";
@@ -111,6 +111,7 @@ const InputMessage = () => {
         }}
       >
         <EmojiPicker
+          searchDisabled
           skinTonesDisabled
           theme={darkMode ? Theme.DARK : Theme.LIGHT}
           emojiStyle={EmojiStyle.GOOGLE}
@@ -129,18 +130,38 @@ const InputMessage = () => {
           bgcolor: "secondary.main",
         }}
       >
-        <Box sx={{ display: img ? "flex" : "none", padding: "2px" }}>
-          <img
-            onClick={() => {
-              dispatch(handleOpenImagePopup({ imageLink: img }));
+        <Box
+          sx={{
+            display: img ? "flex" : "none",
+            padding: "2px",
+          }}
+        >
+          <Box
+            sx={{
+              position: "relative",
             }}
-            style={{ width: "10vh" }}
-            src={img}
-          />
-          <CloseIcon
-            onClick={() => onDeleteFile()}
-            sx={{ cursor: "pointer" }}
-          />
+          >
+            <img
+              onClick={() => {
+                dispatch(handleOpenImagePopup({ imageLink: img }));
+              }}
+              style={{ width: "10vh" }}
+              src={img}
+            ></img>
+            <CloseIcon
+              onClick={() => onDeleteFile()}
+              sx={{
+                cursor: "pointer",
+                position: "absolute",
+                right: 0,
+                top: 0,
+                transition:'all .2s ease-in-out',
+                "&:hover": {
+                  opacity: 0.6,
+                },
+              }}
+            />
+          </Box>
         </Box>
         <Box
           sx={{
@@ -161,20 +182,21 @@ const InputMessage = () => {
             name="message"
             onChange={(e) => setText(e.target.value)}
             value={text}
-            autoFocus
             size="small"
             inputProps={{
               style: { fontFamily: "Noto Color Emoji, sans-serif" },
             }}
           />
 
-          <Button
+          <IconButton
+            color="primary"
             onClick={(e) => {
               handleClick(e);
             }}
+            size="small"
           >
             <EmojiEmotionsIcon />
-          </Button>
+          </IconButton>
           <input
             style={{ display: "none" }}
             id="raised-button-file"
@@ -183,13 +205,18 @@ const InputMessage = () => {
             onChange={onSelectFile}
           />
           <label htmlFor="raised-button-file">
-            <Button component="span">
+            <IconButton color="primary" size="small" component="span">
               <AttachFileIcon />
-            </Button>
+            </IconButton>
           </label>
-          <Button disabled={!text && !img} type="submit">
+          <IconButton
+            color="primary"
+            size="small"
+            disabled={!text && !img}
+            type="submit"
+          >
             <SendRoundedIcon></SendRoundedIcon>
-          </Button>
+          </IconButton>
         </Box>
       </Box>
     </>
