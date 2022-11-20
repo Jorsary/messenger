@@ -18,7 +18,8 @@ const Wrapper = ({ children }: PropsState) => {
           boxShadow: { xs: 0, md: 4 },
           borderRadius: 5,
           display: "flex",
-          padding: { xs: 0, md: 4 },
+          padding: { xs: 0, md: 4},
+          pb: { xs: 0, md: 0 },
           height: { xs: "85vh", md: "90vh" },
           width: "100%",
         }}

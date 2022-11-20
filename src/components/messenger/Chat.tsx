@@ -6,8 +6,9 @@ import {
   Box,
   IconButton,
   Toolbar,
-  Typography
+  Typography,
 } from "@mui/material";
+import { height } from "@mui/system";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -49,16 +50,19 @@ const Chat = ({ id }: any) => {
           padding: { xs: 0, md: 1 },
           position: "relative",
           flex: "3",
-          display: id && enemyUser ? "block" : "none",
-          height: { xs: "97vh", md: "85vh" },
+          display: id && enemyUser ? "flex" : "none",
+          flexDirection:'column',
+          justifyContent:'space-between',
+          height:{ xs: '98vh', md: 'auto' },
         }}
       >
         <AppBar
           position="static"
           sx={{
             boxShadow: 3,
-            borderRadius: 1,
+            borderRadius: 2,
           }}
+        
         >
           <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <IconButton
@@ -85,11 +89,10 @@ const Chat = ({ id }: any) => {
             padding: 1,
             display: "flex",
             flexDirection: "column",
-            scrollBehavior: "smooth",
             width: "100%",
             overflowY: "auto",
             gap: 2,
-            height: "80%",
+            height: "100%",
           }}
           position="relative"
         >
@@ -99,7 +102,6 @@ const Chat = ({ id }: any) => {
             ))}
           </>
         </Box>
-
         <InputMessage />
       </Box>
 

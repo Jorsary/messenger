@@ -2,6 +2,7 @@ import {
   Action, combineReducers, configureStore, ThunkAction
 } from "@reduxjs/toolkit";
 import chatReducer from "./chatSlice";
+import popupsReducer from "./popupsSlice";
 import themeReducer from "./themeSlice";
 import userReducer from "./userSlice";
 
@@ -9,6 +10,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   theme: themeReducer,
   chat: chatReducer,
+  popups: popupsReducer
 });
 
 export const store = configureStore({

@@ -2,6 +2,8 @@ import { Avatar, Box, Card, Typography } from "@mui/material";
 import { UserInfo } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import { auth } from "../../firebase/firebase";
+import { useAppDispatch } from "../../hooks/redux-hooks";
+import { handleOpenImagePopup } from "../../store/popupsSlice";
 import stringToColor from "../../utlis/stringToColor";
 import Loader from "../Loader";
 
@@ -22,6 +24,9 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
   const [loaded, setLoaded] = useState(false);
   const senderUser = message.senderId === enemyUser?.uid;
   const chatRef = useRef<HTMLDivElement | null>(null);
+  const dispatch = useAppDispatch()
+
+
   useEffect(() => {
     if (chatRef.current) {
       chatRef.current.scrollIntoView();
@@ -117,6 +122,7 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
         {message.img && (
           <>
             <img
+              onClick={()=>{{message.img && dispatch(handleOpenImagePopup({imageLink:message.img}))}}}
               style={{ display: loaded ? "block" : "none" }}
               src={message.img}
               onLoad={() => {

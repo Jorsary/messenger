@@ -2,11 +2,13 @@ import { Avatar, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { Navigate } from "react-router-dom";
 import Wrapper from "../components/layout/Wrapper";
-import { useAppSelector } from "../hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
+import { handleOpenImagePopup } from "../store/popupsSlice";
 import stringToColor from "../utlis/stringToColor";
 
 const Profile = () => {
   const { displayName, photoURL } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   if (displayName) {
     return (
       <Wrapper>
@@ -19,16 +21,24 @@ const Profile = () => {
           }}
         >
           <Avatar
+            onClick={() => {
+              {
+                photoURL &&
+                  dispatch(handleOpenImagePopup({ imageLink: photoURL }));
+              }
+            }}
             sx={{
               maxWidth: 250,
               maxHeight: 250,
-              background: "white",
+              background: !photoURL
+                ? stringToColor(`${displayName}`)
+                : `url(${photoURL})`,
+              backgroundSize: "contain",
               width: "50vw",
               height: "50vw",
-              bgcolor: stringToColor(`${displayName}`),
             }}
             alt={`${displayName}`}
-            src={`${photoURL}`}
+            srcSet={`${photoURL}`}
           />
           <Typography
             sx={{

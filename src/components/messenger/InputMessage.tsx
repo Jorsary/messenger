@@ -1,6 +1,7 @@
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CloseIcon from "@mui/icons-material/Close";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { Box, Button, Card, TextField } from "@mui/material";
+import { Box, Button, TextField,AppBar } from "@mui/material";
 import {
   arrayUnion,
   doc,
@@ -8,52 +9,60 @@ import {
   Timestamp,
   updateDoc
 } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  StorageReference,
+  uploadBytesResumable
+} from "firebase/storage";
 import { ChangeEvent, useRef, useState } from "react";
 import uuid from "react-uuid";
 import { auth, db, storage } from "../../firebase/firebase";
-import { useAppSelector } from "../../hooks/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import { handleOpenImagePopup } from "../../store/popupsSlice";
 
 const InputMessage = () => {
   const [text, setText] = useState("");
-  const [img, setImg] = useState<File | null>();
+  const [img, setImg] = useState<string>("");
+  const [storageRefImg, setStorageRefImg] = useState<StorageReference>();
   const imgRef = useRef<HTMLInputElement>(null);
+  const dispatch = useAppDispatch();
 
   const { chatId, enemyUser } = useAppSelector((state) => state.chat);
 
-  const onSelectFile = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setImg(null);
-      return;
+  const onSelectFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (auth.currentUser && e.target.files) {
+      const storageRef = ref(storage, uuid());
+      await uploadBytesResumable(storageRef, e.target.files[0]);
+      const downloadURL = await getDownloadURL(storageRef);
+      setImg(downloadURL);
+      setStorageRefImg(storageRef);
+      if (imgRef.current) {
+        imgRef.current.value = "";
+        console.log(imgRef.current.files);
+      }
     }
-    setImg(e.target.files[0]);
+  };
+
+  const onDeleteFile = () => {
+    if (storageRefImg) {
+      deleteObject(storageRefImg);
+      setImg('')
+    }
   };
 
   const handleSend = async () => {
     if (auth.currentUser && enemyUser) {
-      if (img) {
-        const storageRef = ref(storage, uuid());
-        await uploadBytesResumable(storageRef, img);
-        const downloadURL = await getDownloadURL(storageRef);
-        await updateDoc(doc(db, "chats", chatId), {
-          messages: arrayUnion({
-            id: uuid(),
-            text,
-            senderId: auth.currentUser.uid,
-            date: Timestamp.now(),
-            img: downloadURL,
-          }),
-        });
-      } else {
-        await updateDoc(doc(db, "chats", chatId), {
-          messages: arrayUnion({
-            id: uuid(),
-            text,
-            senderId: auth.currentUser.uid,
-            date: Timestamp.now(),
-          }),
-        });
-      }
+      await updateDoc(doc(db, "chats", chatId), {
+        messages: arrayUnion({
+          id: uuid(),
+          text,
+          senderId: auth.currentUser.uid,
+          date: Timestamp.now(),
+          img: img,
+        }),
+      });
 
       await updateDoc(doc(db, "userChats", auth.currentUser.uid), {
         [chatId + ".lastMessage"]: {
@@ -70,30 +79,37 @@ const InputMessage = () => {
       });
 
       setText("");
-      setImg(null);
-      if (imgRef.current) {
-        imgRef.current.value = "";
-        console.log(imgRef.current.files);
-      }
+      setImg("");
     }
   };
 
   return (
-    <Card
+    <Box
       sx={{
-        position: "absolute",
-        bottom: 0,
         boxShadow: 3,
-        borderRadius: 1,
-        padding: 1,
+        borderRadius: 2,
         width: "100%",
+        padding: 2,
+        bgcolor: 'secondary.main'
       }}
     >
+      <Box sx={{ display: img ? "flex" : "none",padding:'2px' }}>
+        <img
+          onClick={() => {
+            dispatch(handleOpenImagePopup({ imageLink: img }));
+          }}
+          style={{width:'10vh'}}
+          src={img}
+        />
+        <CloseIcon onClick={() => onDeleteFile()} sx={{ cursor: "pointer" }} />
+      </Box>
+
       <Box
         sx={{
           display: "flex",
           gap: 1,
           alignItems: "center",
+          
         }}
         component="form"
         onSubmit={(e) => {
@@ -109,6 +125,7 @@ const InputMessage = () => {
           onChange={(e) => setText(e.target.value)}
           value={text}
           autoFocus
+          size="small"
         />
         <input
           style={{ display: "none" }}
@@ -126,7 +143,7 @@ const InputMessage = () => {
           <SendRoundedIcon></SendRoundedIcon>
         </Button>
       </Box>
-    </Card>
+    </Box>
   );
 };
 
