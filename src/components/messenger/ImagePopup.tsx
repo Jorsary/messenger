@@ -1,7 +1,7 @@
-import { memo, useEffect, useState } from "react";
-import { Backdrop, Card, Box } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import CloseIcon from "@mui/icons-material/Close";
+import { Backdrop, Card } from "@mui/material";
+import { memo } from "react";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { handleCloseImagePopup } from "../../store/popupsSlice";
 
 function ImagePopup() {

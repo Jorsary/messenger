@@ -17,8 +17,8 @@ const UserChat = ({ info }: any) => {
           ? auth.currentUser.uid + u.uid
           : u.uid + auth.currentUser.uid;
       dispatch(changeUser({ u, res }));
+      push(`/messenger/${res}`)
     }
-    push(`/messenger/${userInfo.displayName}`)
   };
 
   const [userInfo, setUserInfo] = useState<any>({});

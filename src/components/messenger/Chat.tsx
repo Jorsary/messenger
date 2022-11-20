@@ -6,11 +6,10 @@ import {
   Box,
   IconButton,
   Toolbar,
-  Typography,
+  Typography
 } from "@mui/material";
-import { height } from "@mui/system";
 import { doc, onSnapshot } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState,memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
@@ -39,7 +38,6 @@ const Chat = ({ id }: any) => {
       console.log(err);
     }
   }, [chatId]);
-
   const push = useNavigate();
   const goBack = () => push(-1);
 
@@ -50,7 +48,7 @@ const Chat = ({ id }: any) => {
           padding: { xs: 0, md: 1 },
           position: "relative",
           flex: "3",
-          display: id && enemyUser ? "flex" : "none",
+          display: chatId && enemyUser ? "flex" : "none",
           flexDirection:'column',
           justifyContent:'space-between',
           height:{ xs: '98vh', md: 'auto' },
@@ -127,4 +125,4 @@ const Chat = ({ id }: any) => {
   );
 };
 
-export default Chat;
+export default memo(Chat);
