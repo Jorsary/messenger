@@ -4,6 +4,7 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import { AppBar, Box, Container, IconButton, Toolbar } from "@mui/material";
+import { memo } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../../hooks/redux-hooks";
 import { NavLinks, SettingsLinks } from "../../models";
@@ -71,4 +72,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default memo(Header);

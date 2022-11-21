@@ -27,8 +27,8 @@ export const darkTheme = createTheme({
   palette: {
     mode: "dark",
     secondary: {
-      main: "#272727"
-    }
+      main: "#272727",
+    },
   },
 });
 
@@ -39,8 +39,8 @@ export const ligthTheme = createTheme({
       default: "#edeef0",
     },
     secondary: {
-      main: "#edeef0"
-    }
+      main: "#edeef0",
+    },
   },
 });
 
@@ -49,12 +49,11 @@ function App() {
   const [user, loading, error] = useAuthState(auth);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(setLoading({loading, error }));
+    dispatch(setLoading({ loading, error }));
     dispatch(setUserInfo({ ...user }));
   }, [user, loading, error]);
 
   const { loadingUser } = useAppSelector((state) => state.user);
-
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : ligthTheme}>

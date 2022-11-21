@@ -5,6 +5,7 @@ import { auth } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import { NavLinks } from "../../models";
 import Logo from "./Logo";
+import {memo} from 'react'
 
 interface NavigationProps {
   links: NavLinks[];
@@ -69,4 +70,4 @@ const Navigation = ({ links }: NavigationProps) => {
   );
 };
 
-export default Navigation;
+export default memo(Navigation);

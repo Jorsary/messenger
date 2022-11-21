@@ -4,14 +4,12 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/system";
-import React, { useState } from "react";
+import React, { useState,memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import { SettingsLinks } from "../../models";
 import stringToColor from "../../utlis/stringToColor";
-import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import Logo from "./Logo";
 
 interface UserProps {
   settings: SettingsLinks[];
@@ -102,4 +100,4 @@ const User = ({ settings }: UserProps) => {
   );
 };
 
-export default User;
+export default memo(User);

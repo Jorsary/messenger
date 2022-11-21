@@ -18,23 +18,32 @@ import {
   StorageReference,
   uploadBytesResumable,
 } from "firebase/storage";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState, useEffect } from "react";
 import uuid from "react-uuid";
 import { auth, db, storage } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { handleOpenImagePopup } from "../../store/popupsSlice";
+import KeyboardVoiceRoundedIcon from "@mui/icons-material/KeyboardVoiceRounded";
 
 const InputMessage = () => {
   const [text, setText] = useState("");
   const [img, setImg] = useState<string>("");
+  const [onRecord, setOnRecord] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [storageRefImg, setStorageRefImg] = useState<StorageReference>();
+
+  const stopButtonRef = useRef<HTMLButtonElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
+
   const dispatch = useAppDispatch();
 
   const { chatId, enemyUser } = useAppSelector((state) => state.chat);
   const { darkMode } = useAppSelector((state) => state.theme);
 
-  const onSelectFile = async (e: ChangeEvent<HTMLInputElement>) => {
+  const onSelectImage = async (e: ChangeEvent<HTMLInputElement>) => {
     if (auth.currentUser && e.target.files) {
       const storageRef = ref(storage, uuid());
       await uploadBytesResumable(storageRef, e.target.files[0]);
@@ -43,7 +52,6 @@ const InputMessage = () => {
       setStorageRefImg(storageRef);
       if (imgRef.current) {
         imgRef.current.value = "";
-        console.log(imgRef.current.files);
       }
     }
   };
@@ -55,7 +63,7 @@ const InputMessage = () => {
     }
   };
 
-  const handleSend = async () => {
+  const handleSend = async (voices?: string) => {
     if (auth.currentUser && enemyUser) {
       await updateDoc(doc(db, "chats", chatId), {
         messages: arrayUnion({
@@ -64,6 +72,7 @@ const InputMessage = () => {
           senderId: auth.currentUser.uid,
           date: Timestamp.now(),
           img: img,
+          voices: voices ? voices: '' ,
         }),
       });
 
@@ -93,10 +102,41 @@ const InputMessage = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  function startRecording() {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: false })
+      .then(function (stream) {
+        const options = { mimeType: "audio/webm" };
+        const recordedChunks: any = [];
+        const mediaRecorder = new MediaRecorder(stream, options);
+        setOnRecord(true);
+
+        mediaRecorder.addEventListener("dataavailable", function (e: any) {
+          console.log(e.target);
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        });
+
+        mediaRecorder.addEventListener("stop", async function () {
+          const storageRef = ref(storage, uuid());
+          await uploadBytesResumable(storageRef, new Blob(recordedChunks));
+          const downloadURL = await getDownloadURL(storageRef);
+          handleSend(downloadURL);
+        });
+
+        if (stopButtonRef && stopButtonRef.current)
+          stopButtonRef?.current?.addEventListener(
+            "click",
+            async function onStopClick() {
+              mediaRecorder.stop();
+              this.removeEventListener("click", onStopClick);
+              setOnRecord(false);
+            }
+          );
+
+        mediaRecorder.start();
+      });
+  }
 
   return (
     <>
@@ -155,7 +195,7 @@ const InputMessage = () => {
                 position: "absolute",
                 right: 0,
                 top: 0,
-                transition:'all .2s ease-in-out',
+                transition: "all .2s ease-in-out",
                 "&:hover": {
                   opacity: 0.6,
                 },
@@ -202,7 +242,7 @@ const InputMessage = () => {
             id="raised-button-file"
             type="file"
             ref={imgRef}
-            onChange={onSelectFile}
+            onChange={onSelectImage}
           />
           <label htmlFor="raised-button-file">
             <IconButton color="primary" size="small" component="span">
@@ -214,9 +254,30 @@ const InputMessage = () => {
             size="small"
             disabled={!text && !img}
             type="submit"
+            sx={{ display: text ? "block" : "none" }}
           >
             <SendRoundedIcon></SendRoundedIcon>
           </IconButton>
+          {!text && (
+            <>
+              <IconButton
+                color="primary"
+                size="small"
+                sx={{ display: !onRecord ? "block" : "none" }}
+                onClick={startRecording}
+              >
+                <KeyboardVoiceRoundedIcon />
+              </IconButton>
+              <IconButton
+                color="primary"
+                size="small"
+                ref={stopButtonRef}
+                sx={{ display: onRecord ? "block" : "none" }}
+              >
+                стоп
+              </IconButton>
+            </>
+          )}
         </Box>
       </Box>
     </>
