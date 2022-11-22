@@ -1,4 +1,7 @@
-import { Avatar, Box, Card, Grid, Typography } from "@mui/material";
+import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded";
+import PlayCircleFilledRoundedIcon from "@mui/icons-material/PlayCircleFilledRounded";
+import { Avatar, Box, Card, IconButton, Typography } from "@mui/material";
+import LinearProgress from "@mui/material/LinearProgress";
 import { UserInfo } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import { auth } from "../../firebase/firebase";
@@ -6,10 +9,6 @@ import { useAppDispatch } from "../../hooks/redux-hooks";
 import { handleOpenImagePopup } from "../../store/popupsSlice";
 import stringToColor from "../../utlis/stringToColor";
 import Loader from "../Loader";
-import PlayCircleFilledRoundedIcon from "@mui/icons-material/PlayCircleFilledRounded";
-import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded";
-
-import LinearProgress from "@mui/material/LinearProgress";
 interface InfoMessage {
   message: IMessage;
   enemyUser: UserInfo | null;
@@ -22,13 +21,15 @@ export interface IMessage {
   text: string;
   img?: string;
   voices?: string;
+  duration?: number;
 }
 
 const Message = ({ message, enemyUser }: InfoMessage) => {
   const [loaded, setLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [currentTime, setCurrentTime] = useState('00:00');
+  const [currentTime, setCurrentTime] = useState<string>("00:00");
+  const [duration, setDuration] = useState<string>();
 
   const senderUser = message.senderId === enemyUser?.uid;
   const chatRef = useRef<HTMLDivElement | null>(null);
@@ -42,10 +43,6 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
     }
   }, [message]);
 
-  useEffect(() => {
-    console.log(progress);
-  }, [progress]);
-
   const togglePlay = () => {
     if (audioRef.current) {
       if (!isPlaying) {
@@ -55,6 +52,22 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
       }
     }
   };
+
+  const secondInClocks = (time: number) => {
+    const hours = Math.floor(time / 60 / 60);
+    const minutes = Math.floor(time / 60) - hours * 60;
+    const seconds = time % 60;
+    return { hours, minutes, seconds };
+  };
+
+  useEffect(() => {
+    if(message.duration){const duration = secondInClocks(message.duration);
+    setDuration(
+      `${Math.trunc(duration.minutes) < 10 ? 0 : ""}${duration.minutes}:${
+        Math.trunc(duration.seconds) < 10 ? 0 : ""
+      }${Math.trunc(duration.seconds)}`
+    );}
+  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -71,7 +84,7 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
         () => {
           setIsPlaying(false);
           setProgress(0);
-          setCurrentTime('00:00');
+          setCurrentTime("00:00");
         },
         false
       );
@@ -83,17 +96,20 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
         false
       );
       audioRef.current.addEventListener("timeupdate", () => {
-        const duration = (audioRef.current && audioRef.current.duration) || 0;
-        if (audioRef.current) {
-          setProgress(audioRef.current.currentTime / duration);
-          var hours = Math.floor(audioRef.current.currentTime / 60 / 60);
-          var minutes = Math.floor(audioRef.current.currentTime / 60) - hours * 60;
-          var seconds = audioRef.current.currentTime % 60;
-          setCurrentTime(`${Math.trunc(minutes)<10?0:''}${minutes}:${Math.trunc(seconds)<10?0:''}${Math.trunc(seconds)}`);
+        if (audioRef.current && message.duration) {
+          setProgress(audioRef.current.currentTime / message.duration);
+
+          const time = secondInClocks(audioRef.current.currentTime);
+          setCurrentTime(
+            `${Math.trunc(time.minutes) < 10 ? 0 : ""}${time.minutes}:${
+              Math.trunc(time.seconds) < 10 ? 0 : ""
+            }${Math.trunc(time.seconds)}`
+          );
         }
       });
     }
   }, []);
+
   return (
     <Box
       ref={chatRef}
@@ -176,7 +192,7 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
             sx={{
               maxWidth: 400,
               wordWrap: "break-word",
-              fontFamily: "Noto Color Emoji, sans-serif",
+              fontFamily: "sans-serif, Noto Color Emoji",
               fontSize: 16,
               lineHeight: 1,
             }}
@@ -209,23 +225,37 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
               ref={audioRef}
               style={{ display: "none" }}
               src={message.voices}
-              preload='auto'
+              preload="auto"
+              id="track"
             ></audio>
             <Box
-              sx={{ display: "flex", alignItems: "center",width:'250px' }}
-              onClick={togglePlay}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "2px",
+              }}
             >
-              {isPlaying ? (
-                <PauseCircleFilledRoundedIcon />
-              ) : (
-                <PlayCircleFilledRoundedIcon />
-              )}
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={togglePlay}
+                sx={{ padding: 0 }}
+              >
+                {isPlaying ? (
+                  <PauseCircleFilledRoundedIcon />
+                ) : (
+                  <PlayCircleFilledRoundedIcon />
+                )}
+              </IconButton>
+
               <LinearProgress
-                sx={{width:'100%'}}
+                sx={{ flexGrow: 2, width: "16vw" }}
                 variant="determinate"
-                value={progress*100}
+                value={progress * 100}
               />
-              <Typography variant="caption">{currentTime}</Typography>
+              <Typography variant="caption">
+                {isPlaying ? currentTime : duration}
+              </Typography>
             </Box>
           </>
         )}

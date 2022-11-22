@@ -1,8 +1,11 @@
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CloseIcon from "@mui/icons-material/Close";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+import KeyboardVoiceRoundedIcon from "@mui/icons-material/KeyboardVoiceRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { Box, Button, IconButton, Popover, TextField } from "@mui/material";
+import StopCircleIcon from "@mui/icons-material/StopCircle";
+import { Box, IconButton, Popover, TextField } from "@mui/material";
+import LinearProgress from "@mui/material/LinearProgress";
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import {
   arrayUnion,
@@ -23,7 +26,6 @@ import uuid from "react-uuid";
 import { auth, db, storage } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { handleOpenImagePopup } from "../../store/popupsSlice";
-import KeyboardVoiceRoundedIcon from "@mui/icons-material/KeyboardVoiceRounded";
 
 const InputMessage = () => {
   const [text, setText] = useState("");
@@ -31,8 +33,11 @@ const InputMessage = () => {
   const [onRecord, setOnRecord] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [storageRefImg, setStorageRefImg] = useState<StorageReference>();
+  const [progress, setProgress] = useState<number>(0);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
 
-  const stopButtonRef = useRef<HTMLButtonElement>(null);
+  const stopVoiceRef = useRef<HTMLButtonElement>(null);
+  const sendVoiseRef = useRef<HTMLButtonElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
 
   const open = Boolean(anchorEl);
@@ -63,35 +68,44 @@ const InputMessage = () => {
     }
   };
 
-  const handleSend = async (voices?: string) => {
+  const handleSend = async (voices?: string, duration?: number) => {
+    const textMessage = text;
+    setText("");
+    setImg("");
     if (auth.currentUser && enemyUser) {
       await updateDoc(doc(db, "chats", chatId), {
         messages: arrayUnion({
           id: uuid(),
-          text,
+          text: textMessage,
           senderId: auth.currentUser.uid,
           date: Timestamp.now(),
           img: img,
-          voices: voices ? voices: '' ,
+          voices: voices ? voices : "",
+          duration: duration ? duration : 0,
         }),
       });
 
       await updateDoc(doc(db, "userChats", auth.currentUser.uid), {
         [chatId + ".lastMessage"]: {
-          text,
+          text: voices
+            ? "Голосовое сообщение"
+            : textMessage
+            ? textMessage
+            : "Изображение",
         },
         [chatId + ".date"]: serverTimestamp(),
       });
 
       await updateDoc(doc(db, "userChats", enemyUser.uid), {
         [chatId + ".lastMessage"]: {
-          text,
+          text: voices
+            ? "Голосовое сообщение"
+            : textMessage
+            ? textMessage
+            : "Изображение",
         },
         [chatId + ".date"]: serverTimestamp(),
       });
-
-      setText("");
-      setImg("");
     }
   };
 
@@ -103,29 +117,57 @@ const InputMessage = () => {
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prevProgress) =>
+        prevProgress >= 100 ? 10 : prevProgress + 10
+      );
+    }, 800);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   function startRecording() {
     navigator.mediaDevices
-      .getUserMedia({ audio: true, video: false })
+      .getUserMedia({ audio: true })
       .then(function (stream) {
         const options = { mimeType: "audio/webm" };
         const recordedChunks: any = [];
         const mediaRecorder = new MediaRecorder(stream, options);
         setOnRecord(true);
-
-        mediaRecorder.addEventListener("dataavailable", function (e: any) {
-          console.log(e.target);
-          if (e.data.size > 0) recordedChunks.push(e.data);
-        });
-
+        mediaRecorder.addEventListener("start", function (e: any) {});
+        mediaRecorder.addEventListener(
+          "dataavailable",
+          function (e: BlobEvent) {
+            if (e.data.size > 0) recordedChunks.push(e.data);
+          }
+        );
         mediaRecorder.addEventListener("stop", async function () {
+          const duration = recordedChunks[0].size / 6900;
           const storageRef = ref(storage, uuid());
-          await uploadBytesResumable(storageRef, new Blob(recordedChunks));
+          await uploadBytesResumable(
+            storageRef,
+            new File(recordedChunks, "str.wav", { type: "audio/webm" })
+          );
           const downloadURL = await getDownloadURL(storageRef);
-          handleSend(downloadURL);
+          console.log(downloadURL);
+          handleSend(downloadURL, duration);
         });
 
-        if (stopButtonRef && stopButtonRef.current)
-          stopButtonRef?.current?.addEventListener(
+        if (sendVoiseRef && sendVoiseRef.current)
+          sendVoiseRef?.current?.addEventListener(
+            "click",
+            async function onSendClick() {
+              console.log(mediaRecorder)
+              mediaRecorder.stop();
+              this.removeEventListener("click", onSendClick);
+              setOnRecord(false);
+            }
+          );
+
+        if (stopVoiceRef && stopVoiceRef.current)
+          stopVoiceRef?.current?.addEventListener(
             "click",
             async function onStopClick() {
               mediaRecorder.stop();
@@ -137,7 +179,6 @@ const InputMessage = () => {
         mediaRecorder.start();
       });
   }
-
   return (
     <>
       <Popover
@@ -151,6 +192,7 @@ const InputMessage = () => {
         }}
       >
         <EmojiPicker
+          lazyLoadEmojis
           searchDisabled
           skinTonesDisabled
           theme={darkMode ? Theme.DARK : Theme.LIGHT}
@@ -203,63 +245,100 @@ const InputMessage = () => {
             />
           </Box>
         </Box>
+
         <Box
           sx={{
             display: "flex",
             gap: 1,
             alignItems: "center",
           }}
-          component="form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSend();
-          }}
         >
-          <TextField
-            fullWidth
-            id="message"
-            label="Введите сообщение"
-            name="message"
-            onChange={(e) => setText(e.target.value)}
-            value={text}
-            size="small"
-            inputProps={{
-              style: { fontFamily: "Noto Color Emoji, sans-serif" },
+          <Box
+            sx={{
+              display: onRecord ? "none" : "flex",
+              gap: 1,
+              alignItems: "center",
+              width: "100%",
             }}
-          />
+            component="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+          >
+            <TextField
+              fullWidth
+              id="message"
+              label="Введите сообщение"
+              name="message"
+              onChange={(e) => setText(e.target.value)}
+              value={text}
+              size="small"
+              inputProps={{
+                style: { fontFamily: "sans-serif, Noto Color Emoji" },
+              }}
+            />
 
-          <IconButton
-            color="primary"
-            onClick={(e) => {
-              handleClick(e);
-            }}
-            size="small"
-          >
-            <EmojiEmotionsIcon />
-          </IconButton>
-          <input
-            style={{ display: "none" }}
-            id="raised-button-file"
-            type="file"
-            ref={imgRef}
-            onChange={onSelectImage}
-          />
-          <label htmlFor="raised-button-file">
-            <IconButton color="primary" size="small" component="span">
-              <AttachFileIcon />
+            <IconButton
+              color="primary"
+              onClick={(e) => {
+                handleClick(e);
+              }}
+              size="small"
+            >
+              <EmojiEmotionsIcon />
             </IconButton>
-          </label>
-          <IconButton
-            color="primary"
-            size="small"
-            disabled={!text && !img}
-            type="submit"
-            sx={{ display: text ? "block" : "none" }}
-          >
-            <SendRoundedIcon></SendRoundedIcon>
-          </IconButton>
-          {!text && (
+            <input
+              style={{ display: "none" }}
+              id="raised-button-file"
+              type="file"
+              ref={imgRef}
+              onChange={onSelectImage}
+            />
+            <label htmlFor="raised-button-file">
+              <IconButton color="primary" size="small" component="span">
+                <AttachFileIcon />
+              </IconButton>
+            </label>
+            <IconButton
+              color="primary"
+              size="small"
+              disabled={!text && !img}
+              type="submit"
+              sx={{ display: text || img ? "block" : "none" }}
+            >
+              <SendRoundedIcon></SendRoundedIcon>
+            </IconButton>
+          </Box>
+
+          {!text && !img && (
             <>
+              <IconButton
+                color="primary"
+                size="small"
+                ref={stopVoiceRef}
+                sx={{ display: onRecord ? "block" : "none" }}
+              >
+                <StopCircleIcon />
+              </IconButton>
+              <LinearProgress
+                sx={{
+                  flexGrow: 2,
+                  width: "16vw",
+                  display: onRecord ? "block" : "none",
+                }}
+                variant="indeterminate"
+                value={progress}
+              />
+              <IconButton
+                color="primary"
+                size="small"
+                ref={sendVoiseRef}
+                sx={{ display: onRecord ? "block" : "none" }}
+              >
+                <SendRoundedIcon />
+              </IconButton>
+
               <IconButton
                 color="primary"
                 size="small"
@@ -267,14 +346,6 @@ const InputMessage = () => {
                 onClick={startRecording}
               >
                 <KeyboardVoiceRoundedIcon />
-              </IconButton>
-              <IconButton
-                color="primary"
-                size="small"
-                ref={stopButtonRef}
-                sx={{ display: onRecord ? "block" : "none" }}
-              >
-                стоп
               </IconButton>
             </>
           )}
