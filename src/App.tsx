@@ -77,7 +77,7 @@ function App() {
               <Route path="/settings" element={<UserSettings />}></Route>
             </Route>
             <Route path="signin" element={<SignIn />}></Route>
-            <Route path="*" element={<NotFound />}></Route>
+            {/* <Route path="*" element={<NotFound />}></Route> */}
           </Route>
         </Routes>
       )}
