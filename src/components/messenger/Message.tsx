@@ -147,7 +147,7 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
                     dispatch(handleOpenImagePopup({ imageLink: message.img }));
                 }
               }}
-              style={{ display: loaded ? "block" : "none" }}
+              style={{ display: loaded ? "block" : "none",maxWidth:400 }}
               src={message.img}
               onLoad={() => {
                 setLoaded(true);

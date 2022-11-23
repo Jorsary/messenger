@@ -87,8 +87,8 @@ const UserSettings = () => {
               backgroundSize: "contain",
               width: "50vw",
               height: "50vw",
+              display: displayName ? 'flex' : 'none'
             }}
-            alt={`${displayName}`}
             srcSet={`${photoURL}`}
           />
           <Typography

@@ -61,6 +61,7 @@ export default function SignIn() {
 
   const onSubmit = async (data: IAuthForm) => {
     try {
+      setLoading(true)
       const response = await generateRecaptcha(data.phone);
       setResult(response);
       setFlag(true);
@@ -68,6 +69,8 @@ export default function SignIn() {
     } catch (err) {
       console.log(err);
     }
+    reset();
+    setLoading(false)
   };
 
   const verifyOtp = async (data: IAuthForm) => {
@@ -90,7 +93,7 @@ export default function SignIn() {
   if (auth.currentUser) {
     return <Navigate to="/" />;
   }
-  if (loadingUser || loading) {
+  if (loadingUser) {
     return (
       <Box sx={{ height: "80vh" }}>
         <Loader />
@@ -99,6 +102,7 @@ export default function SignIn() {
   }
   return (
     <Container component="main" maxWidth="xs">
+      <Box id="recaptcha-container"></Box>
       <Box
         sx={{
           paddingTop: 10,
@@ -118,7 +122,6 @@ export default function SignIn() {
             component="form"
             onSubmit={handleSubmit((data) => {
               onSubmit(data);
-              reset();
             })}
             noValidate
             sx={{ mt: 1 }}
@@ -145,14 +148,14 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Запомнить меня"
             />
-            <Box id="recaptcha-container"></Box>
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Войти
+              {loading ? <Loader/> : 'Войти'}
             </Button>
             <Box id="recaptcha"></Box>
           </Box>
@@ -164,8 +167,9 @@ export default function SignIn() {
               reset();
             })}
             noValidate
-            sx={{ mt: 1 }}
+            sx={{ mt: 1, textAlign: "center" }}
           >
+            На ваш телефон отправлен код
             <TextField
               error={!!errors.otp?.message}
               margin="normal"
