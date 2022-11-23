@@ -3,7 +3,7 @@ import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
-import { AppBar, Box, Container, IconButton, Toolbar } from "@mui/material";
+import { AppBar, Box, Container, IconButton, MenuItem, Toolbar } from "@mui/material";
 import { memo } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../../hooks/redux-hooks";
@@ -62,9 +62,9 @@ const Header = () => {
           >
             <Navigation links={links} />
             <User settings={settings} />
-            <IconButton onClick={() => dispatch(setTheme())}>
+            <MenuItem onClick={() => dispatch(setTheme())}>
               <Brightness4RoundedIcon></Brightness4RoundedIcon>
-            </IconButton>
+            </MenuItem>
           </Box>
         </Toolbar>
       </Container>

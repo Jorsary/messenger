@@ -132,9 +132,11 @@ const InputMessage = () => {
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(function (stream) {
-        const options = { mimeType: "audio/webm" };
         const recordedChunks: any = [];
-        const mediaRecorder = new MediaRecorder(stream, options);
+        const mediaRecorder = new MediaRecorder(stream, {
+          mimeType: "audio/webm",
+          audioBitsPerSecond: 128000,
+        });
         setOnRecord(true);
         mediaRecorder.addEventListener("start", function (e: any) {});
         mediaRecorder.addEventListener(
@@ -144,11 +146,12 @@ const InputMessage = () => {
           }
         );
         mediaRecorder.addEventListener("stop", async function () {
-          const duration = recordedChunks[0].size / 6900;
-          const storageRef = ref(storage, uuid());
+          console.log(recordedChunks[0]);
+          const duration = recordedChunks[0].size / 16000;
+          const storageRef = ref(storage, `${uuid()}.webm`);
           await uploadBytesResumable(
             storageRef,
-            new File(recordedChunks, "str.wav", { type: "audio/webm" })
+            new File(recordedChunks, "", { type: "audio/webm" })
           );
           const downloadURL = await getDownloadURL(storageRef);
           console.log(downloadURL);
@@ -159,7 +162,7 @@ const InputMessage = () => {
           sendVoiseRef?.current?.addEventListener(
             "click",
             async function onSendClick() {
-              console.log(mediaRecorder)
+              console.log(mediaRecorder);
               mediaRecorder.stop();
               this.removeEventListener("click", onSendClick);
               setOnRecord(false);
@@ -187,8 +190,12 @@ const InputMessage = () => {
         anchorEl={anchorEl}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: "bottom",
+          vertical: "top",
           horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
         }}
       >
         <EmojiPicker

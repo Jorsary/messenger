@@ -1,19 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Button, Typography } from "@mui/material";
 import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded";
 import PlayCircleFilledRoundedIcon from "@mui/icons-material/PlayCircleFilledRounded";
-
-export default function Player(props) {
-  console.log(props.props);
-  const [wavesurfer, setWavesurfer] = useState(null);
+interface PlayerProps {
+  voice: string;
+  length: number;
+}
+export default function Player({ voice, length }: PlayerProps) {
+  const [wavesurfer, setWavesurfer] = useState<WaveSurfer>();
   const [playing, setPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
-  const [dlina, setDlina] = useState("");
-
-  const el = useRef();
-
-  const secondInClocks = (time) => {
+  const [timer, setTimer] = useState("");
+  const [speedRate, setSpeedRate] = useState(1);
+  const el = useRef<any>();
+  const secondInClocks = (time: number) => {
     const hours = Math.floor(time / 60 / 60);
     const minutes = Math.floor(time / 60) - hours * 60;
     const seconds = time % 60;
@@ -21,13 +22,14 @@ export default function Player(props) {
   };
 
   useEffect(() => {
-    const glina = secondInClocks(duration);
-    setDlina(
-      `${Math.trunc(glina.minutes) < 10 ? 0 : ""}${glina.minutes}:${
-        Math.trunc(glina.seconds) < 10 ? 0 : ""
-      }${Math.trunc(glina.seconds)}`
+    const clocks = secondInClocks(playing ? duration :length );
+    setTimer(
+      `${Math.trunc(clocks.minutes) < 10 ? 0 : ""}${clocks.minutes}:${
+        Math.trunc(clocks.seconds) < 10 ? 0 : ""
+      }${Math.trunc(clocks.seconds)}`
     );
   }, [duration]);
+  
 
   useEffect(() => {
     let _wavesurfer = WaveSurfer.create({
@@ -37,30 +39,27 @@ export default function Player(props) {
       barGap: 1,
       barMinHeight: 2,
       cursorWidth: 1,
-      backend: "WebAudio",
+      backend: "MediaElement",
       height: 20,
-      progressColor: "#71aaeb",
+      progressColor: "#8774e1",
       responsive: true,
-      waveColor: "#4a6687",
+      waveColor: "#35354c",
       cursorColor: "transparent",
       hideScrollbar: true,
     });
-    _wavesurfer.load(props.voice);
-
+    _wavesurfer.load(voice);
     setWavesurfer(_wavesurfer);
-
     _wavesurfer.on("ready", function () {
-      setDuration(_wavesurfer?.getDuration());
+      setDuration(_wavesurfer.getDuration());
     });
-
     _wavesurfer.on("audioprocess", function () {
-      setDuration(_wavesurfer?.getDuration() - _wavesurfer?.getCurrentTime());
+      setDuration(_wavesurfer.getDuration() - _wavesurfer?.getCurrentTime());
     });
 
     _wavesurfer.on("finish", function () {
       _wavesurfer?.stop();
       setPlaying(false);
-      setDuration(_wavesurfer?.getDuration());
+      setDuration(_wavesurfer.getDuration());
     });
 
     return () => {
@@ -73,9 +72,24 @@ export default function Player(props) {
     setPlaying(!playing);
     wavesurfer?.playPause();
   };
+  const toggleChangeSpeed = () => {
+    if (speedRate >= 2) {
+      setSpeedRate(1);
+    } else {
+      setSpeedRate(speedRate + 0.5);
+    }
+  };
+  useEffect(() => {
+    wavesurfer && wavesurfer.setPlaybackRate(speedRate);
+  }, [speedRate]);
 
   return (
-    <Box gap="10px" display="flex" alignItems="center">
+    <Box
+      sx={{ width: {xs:"55vw" , md: '25vw'}, display: "flex" }}
+      gap="5px"
+      display="flex"
+      alignItems="center"
+    >
       <IconButton
         color="primary"
         size="small"
@@ -88,10 +102,16 @@ export default function Player(props) {
           <PlayCircleFilledRoundedIcon />
         )}
       </IconButton>
-      <div style={{ flexGrow: 1 }} ref={el} />
+      <Box sx={{ flex: 2 }} ref={el} />
       <Typography color="text.disabled" variant="caption">
-        {dlina}
+        {timer}
       </Typography>
+      <Button
+        onClick={toggleChangeSpeed}
+        sx={{ fontSize: 12, padding: 0, borderRadius: "15px",minWidth:'10px' }}
+      >
+        {speedRate}X
+      </Button>
     </Box>
   );
 }

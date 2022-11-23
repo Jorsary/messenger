@@ -46,12 +46,7 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
     }
   }, [message]);
 
-  const secondInClocks = (time: number) => {
-    const hours = Math.floor(time / 60 / 60);
-    const minutes = Math.floor(time / 60) - hours * 60;
-    const seconds = time % 60;
-    return { hours, minutes, seconds };
-  };
+
 
   return (
     <Box
@@ -100,11 +95,12 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
       </Box>
       <Card
         sx={{
-          maxWidth: { xs: 170, sm: 300, md: 450 },
+          maxWidth: { xs: '60vw', md: '35vw' },
           display: "flex",
           flexDirection: "column",
           padding: { xs: 1, md: "11px" },
           gap: 1,
+          width:'max-content'
         }}
       >
         <Box
@@ -133,7 +129,6 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
         {message.text && (
           <Typography
             sx={{
-              maxWidth: 400,
               wordWrap: "break-word",
               fontFamily: "sans-serif, Noto Color Emoji",
               fontSize: 16,
@@ -163,9 +158,8 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
         )}
 
         {message.voices && (
-          <Box sx={{ width: "30vh" }}>
-            <Player voice={message.voices} duration={message.duration} />
-          </Box>
+
+            <Player voice={message.voices} length={message.duration ? message.duration : 0} />
         )}
       </Card>
     </Box>
