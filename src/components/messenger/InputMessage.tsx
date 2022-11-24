@@ -7,6 +7,7 @@ import StopCircleIcon from "@mui/icons-material/StopCircle";
 import { Box, IconButton, Popover, TextField } from "@mui/material";
 import LinearProgress from "@mui/material/LinearProgress";
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
+import { ref as realRef, set } from "firebase/database";
 import {
   arrayUnion,
   doc,
@@ -21,9 +22,9 @@ import {
   StorageReference,
   uploadBytesResumable,
 } from "firebase/storage";
-import { ChangeEvent, useRef, useState, useEffect } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import uuid from "react-uuid";
-import { auth, db, storage } from "../../firebase/firebase";
+import { auth, db, realdb, storage } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { handleOpenImagePopup } from "../../store/popupsSlice";
 
@@ -34,7 +35,6 @@ const InputMessage = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [storageRefImg, setStorageRefImg] = useState<StorageReference>();
   const [progress, setProgress] = useState<number>(0);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
 
   const stopVoiceRef = useRef<HTMLButtonElement>(null);
   const sendVoiseRef = useRef<HTMLButtonElement>(null);
@@ -45,6 +45,7 @@ const InputMessage = () => {
 
   const dispatch = useAppDispatch();
 
+  const { uid } = useAppSelector((state) => state.user);
   const { chatId, enemyUser } = useAppSelector((state) => state.chat);
   const { darkMode } = useAppSelector((state) => state.theme);
 
@@ -60,7 +61,6 @@ const InputMessage = () => {
       }
     }
   };
-
   const onDeleteFile = () => {
     if (storageRefImg) {
       deleteObject(storageRefImg);
@@ -182,6 +182,13 @@ const InputMessage = () => {
         mediaRecorder.start();
       });
   }
+
+  const handleWriting = (writeState: boolean) => {
+    set(realRef(realdb, chatId + uid), {
+      writing: writeState,
+    });
+  };
+
   return (
     <>
       <Popover
@@ -214,6 +221,7 @@ const InputMessage = () => {
         sx={{
           boxShadow: 3,
           borderRadius: 2,
+          borderBottomRightRadius: 0,
           width: "100%",
           padding: 2,
           bgcolor: "secondary.main",
@@ -273,28 +281,6 @@ const InputMessage = () => {
               handleSend();
             }}
           >
-            <TextField
-              fullWidth
-              id="message"
-              label="Введите сообщение"
-              name="message"
-              onChange={(e) => setText(e.target.value)}
-              value={text}
-              size="small"
-              inputProps={{
-                style: { fontFamily: "sans-serif, Noto Color Emoji" },
-              }}
-            />
-
-            <IconButton
-              color="primary"
-              onClick={(e) => {
-                handleClick(e);
-              }}
-              size="small"
-            >
-              <EmojiEmotionsIcon />
-            </IconButton>
             <input
               style={{ display: "none" }}
               id="raised-button-file"
@@ -307,6 +293,35 @@ const InputMessage = () => {
                 <AttachFileIcon />
               </IconButton>
             </label>
+            <TextField
+              variant="standard"
+              fullWidth
+              id="message"
+              placeholder="Введите сообщение"
+              name="message"
+              onChange={(e) => {
+                setText(e.target.value);
+                handleWriting(true);
+              }}
+              value={text}
+              size="small"
+              onBlur={() => {
+                handleWriting(false);
+              }}
+              InputProps={{
+                style: { fontFamily: "sans-serif, Noto Color Emoji" },
+                disableUnderline: true,
+              }}
+            />
+            <IconButton
+              color="primary"
+              onClick={(e) => {
+                handleClick(e);
+              }}
+              size="small"
+            >
+              <EmojiEmotionsIcon />
+            </IconButton>
             <IconButton
               color="primary"
               size="small"
@@ -317,7 +332,6 @@ const InputMessage = () => {
               <SendRoundedIcon></SendRoundedIcon>
             </IconButton>
           </Box>
-
           {!text && !img && (
             <>
               <IconButton

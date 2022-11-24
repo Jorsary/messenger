@@ -36,16 +36,17 @@ export default function Player({ voice, length }: PlayerProps) {
       container: el.current,
       barWidth: 2,
       barRadius: 3,
-      barGap: 1,
+      barGap: 2,
       barMinHeight: 2,
       cursorWidth: 1,
       backend: "MediaElement",
-      height: 20,
+      height: 30,
       progressColor: "#8774e1",
       responsive: true,
       waveColor: "#35354c",
       cursorColor: "transparent",
       hideScrollbar: true,
+      barHeight:5
     });
     _wavesurfer.load(voice);
     setWavesurfer(_wavesurfer);
@@ -102,7 +103,7 @@ export default function Player({ voice, length }: PlayerProps) {
           <PlayCircleFilledRoundedIcon />
         )}
       </IconButton>
-      <Box sx={{ flex: 2 }} ref={el} />
+      <Box sx={{ flex: 2, }} ref={el} />
       <Typography color="text.disabled" variant="caption">
         {timer}
       </Typography>

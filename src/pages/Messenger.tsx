@@ -4,44 +4,54 @@ import { useParams } from "react-router-dom";
 import Wrapper from "../components/layout/Wrapper";
 import Chat from "../components/messenger/Chat";
 import Chats from "../components/messenger/Chats";
-import { db } from "../firebase/firebase";
+import { db, realdb } from "../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
 import { changeUser } from "../store/chatSlice";
+import { onValue, ref as realRef } from "firebase/database";
 
 const Messenger = () => {
-  const { id } = useParams();
+  const { chatid } = useParams();
   const dispatch = useAppDispatch();
   const { uid } = useAppSelector((state) => state.user);
   const [user, setUser] = useState<any>();
+  const [userPresence, setUserPresence] = useState<any>();
   
-  if(!id){
-    dispatch(changeUser({ res: '', u: null }));
+  if(!chatid){
+    dispatch(changeUser({ res: '', u: null, userPresence:{} })); 
   }
 
   useEffect(() => {
-    if (uid && id) {
+    if (uid && chatid) {
       const fetch = async () => {
         const friend = await getDoc(doc(db, "userChats", uid));
         const userInfo = friend.data();
         if (userInfo) {
-          const res: any = await getDoc(userInfo[id].userInfo.userRef);
+          const res: any = await getDoc(userInfo[chatid].userInfo.userRef);
           setUser(res.data());
         }
       };
       fetch();
     }
-  }, [id]);
+  }, [chatid]);
 
   useEffect(() => {
-    if (user && id) {
-      dispatch(changeUser({ res: id, u: user }));
+    if (user && chatid) {
+      const unsub = onValue(realRef(realdb, user.uid), (snapshot) => {
+        const data = snapshot.val();
+        setUserPresence(data)
+        dispatch(changeUser({ res: chatid, u: user,userPresence:data }));
+      });
+      return () => {
+        unsub();
+      };
     }
+   
   }, [user]);
 
   return (
     <Wrapper>
-      <Chats id={id} />
-      <Chat key={id} id={id} />
+      <Chats id={chatid} />
+      <Chat key={chatid} id={chatid} />
     </Wrapper>
   );
 };

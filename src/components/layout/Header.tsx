@@ -40,14 +40,14 @@ const settings: SettingsLinks[] = [
 
 const Header = () => {
   const dispatch = useAppDispatch();
-  const { id } = useParams();
+  const { chatid } = useParams();
   return (
     <AppBar
       sx={{
         position: { xs: "fixed", md: "static" },
         top: "auto",
         bottom: 0,
-        display: { xs: !id ? "block" : "none", md: "block" },
+        display: { xs: !chatid ? "block" : "none", md: "block" },
       }}
     >
       <Container maxWidth="xl">

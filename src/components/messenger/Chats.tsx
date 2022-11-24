@@ -15,7 +15,8 @@ const Chats = ({id}:any) => {
       const getChats = () => {
         const unsub = onSnapshot(doc(db, "userChats", uid), (doc) => {
           setChats(doc.data() || {});
-        });
+        }
+        );
 
         return () => {
           unsub();
@@ -35,6 +36,7 @@ const Chats = ({id}:any) => {
         overflowY: "auto",
         padding: 1,
         flex: "1 0 0",
+        minWidth:200
       }}
     >
       <Search />

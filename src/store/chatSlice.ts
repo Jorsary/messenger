@@ -3,15 +3,18 @@ import { UserInfo } from "firebase/auth";
 interface ChatState {
   chatId: string;
   enemyUser: UserInfo | null;
+  userPresence: any
 }
 const initialState: ChatState = {
   chatId: "null",
   enemyUser: null,
+  userPresence : {}
 };
 
 interface ISelectedChat {
   u: UserInfo | null;
   res: string;
+  userPresence?: any;
 }
 
 const chatSlice = createSlice({
@@ -21,7 +24,10 @@ const chatSlice = createSlice({
     changeUser(state, action: PayloadAction<ISelectedChat>) {
       state.enemyUser = action.payload.u;
       state.chatId = action.payload.res;
+      state.userPresence = action.payload.userPresence
+
     },
+
   },
 });
 
