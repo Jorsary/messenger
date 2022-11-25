@@ -1,42 +1,15 @@
-import styled from "@emotion/styled";
-import { Avatar, Badge, Box, Card, Typography } from "@mui/material";
+import { Avatar, Box, Card, Typography } from "@mui/material";
 import { onValue, ref as realRef } from "firebase/database";
 import { DocumentReference, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, realdb } from "../../firebase/firebase";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import { useAppDispatch } from "../../hooks/redux-hooks";
 import { changeUser } from "../../store/chatSlice";
+import { StyledBadge } from "../../styles/components";
 import stringToColor from "../../utlis/stringToColor";
 
-const StyledBadge = styled(Badge)(({}) => ({
-  "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
-    "&::after": {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      animation: "ripple 1.2s infinite ease-in-out",
-      border: "1px solid currentColor",
-      content: '""',
-    },
-  },
-  "@keyframes ripple": {
-    "0%": {
-      transform: "scale(.8)",
-      opacity: 1,
-    },
-    "100%": {
-      transform: "scale(2.4)",
-      opacity: 0,
-    },
-  },
-}));
-interface UserInfo {
+export interface UserInfo {
   info: {
     date: { seconds: number; nanoseconds: number };
     lastMessage: {
@@ -66,7 +39,6 @@ const UserChat = ({ info }: UserInfo) => {
     }
   };
 
-
   const getUserInfo = async () => {
     const res: any = await getDoc(info.userInfo.userRef);
     setUserInfo(res.data());
@@ -76,7 +48,7 @@ const UserChat = ({ info }: UserInfo) => {
     if (info.userInfo.uid) {
       const unsub = onValue(realRef(realdb, info.userInfo.uid), (snapshot) => {
         const data = snapshot.val();
-        setUserPresence(data)
+        setUserPresence(data);
       });
       return () => {
         unsub();
@@ -107,7 +79,7 @@ const UserChat = ({ info }: UserInfo) => {
         overlap="circular"
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         variant="dot"
-        invisible={userPresence && !userPresence.state}
+        invisible={userPresence ? !userPresence.state : true}
       >
         <Avatar
           sx={{

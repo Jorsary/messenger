@@ -77,14 +77,14 @@ const InputMessage = () => {
         messages: arrayUnion({
           id: uuid(),
           text: textMessage,
+          time: Timestamp.now().seconds,
           senderId: auth.currentUser.uid,
-          date: Timestamp.now(),
           img: img,
           voices: voices ? voices : "",
           duration: duration ? duration : 0,
         }),
       });
-
+      
       await updateDoc(doc(db, "userChats", auth.currentUser.uid), {
         [chatId + ".lastMessage"]: {
           text: voices
@@ -116,17 +116,6 @@ const InputMessage = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) =>
-        prevProgress >= 100 ? 10 : prevProgress + 10
-      );
-    }, 800);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
 
   function startRecording() {
     navigator.mediaDevices
@@ -216,7 +205,6 @@ const InputMessage = () => {
           }}
         />
       </Popover>
-
       <Box
         sx={{
           boxShadow: 3,

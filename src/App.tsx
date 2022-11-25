@@ -5,7 +5,12 @@ import {
   CssBaseline,
   ThemeProvider,
 } from "@mui/material";
-import { onDisconnect } from "firebase/database";
+import {
+  onDisconnect,
+  ref as realRef,
+  serverTimestamp,
+  set,
+} from "firebase/database";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDispatch } from "react-redux";
@@ -22,8 +27,6 @@ import Profile from "./pages/Profile";
 import UserSettings from "./pages/ProfileSettings";
 import SignIn from "./pages/SignIn";
 import { setLoading, setUserInfo } from "./store/userSlice";
-import { ref as realRef, set } from "firebase/database";
-import { Timestamp } from "firebase/firestore";
 
 export const darkTheme = createTheme({
   palette: {
@@ -64,7 +67,12 @@ function App() {
       });
     }
   }, [uid]);
-  if(uid){onDisconnect(realRef(realdb, uid)).set({state:false,time:Timestamp.now()})}
+  if (uid) {
+    onDisconnect(realRef(realdb, uid)).set({
+      state: false,
+      time: serverTimestamp(),
+    });
+  }
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : ligthTheme}>

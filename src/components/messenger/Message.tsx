@@ -1,12 +1,7 @@
-import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded";
-import PlayCircleFilledRoundedIcon from "@mui/icons-material/PlayCircleFilledRounded";
 import {
   Avatar,
   Box,
-  Card,
-  IconButton,
-  LinearProgress,
-  Typography,
+  Card, Typography
 } from "@mui/material";
 import { UserInfo } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
@@ -15,7 +10,6 @@ import { useAppDispatch } from "../../hooks/redux-hooks";
 import { handleOpenImagePopup } from "../../store/popupsSlice";
 import stringToColor from "../../utlis/stringToColor";
 import Loader from "../Loader";
-import WaveSurfer from "wavesurfer.js";
 import Player from "./WafeForm";
 interface InfoMessage {
   message: IMessage;
@@ -23,7 +17,7 @@ interface InfoMessage {
 }
 
 export interface IMessage {
-  date: { seconds: number; nanoseconds: number };
+  time: number;
   id: string;
   senderId: string;
   text: string;
@@ -35,6 +29,7 @@ export interface IMessage {
 const Message = ({ message, enemyUser }: InfoMessage) => {
   const [loaded, setLoaded] = useState(false);
 
+  
   const senderUser = message.senderId === enemyUser?.uid;
   const chatRef = useRef<HTMLDivElement | null>(null);
 
@@ -90,7 +85,7 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
           }}
         />
         <Typography variant="caption">
-          {new Date(message.date.seconds * 1000).toTimeString().split(" ")[0]}
+          {new Date(message.time * 1000).toTimeString().split(" ")[0]}
         </Typography>
       </Box>
       <Card

@@ -1,14 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo } from "firebase/auth";
+import { Timestamp } from "firebase/firestore";
 interface ChatState {
   chatId: string;
   enemyUser: UserInfo | null;
-  userPresence: any
+  userPresence: {
+    state:boolean;
+    time?: number
+  }
 }
 const initialState: ChatState = {
   chatId: "null",
   enemyUser: null,
-  userPresence : {}
+  userPresence : {
+    state:false,
+    time: 0
+  }
 };
 
 interface ISelectedChat {
