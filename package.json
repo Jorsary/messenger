@@ -16,6 +16,7 @@
     "@types/node": "^17.0.45",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
+    "durations": "^3.4.2",
     "emoji-picker-react": "^4.4.5",
     "firebase": "^9.13.0",
     "firebaseui": "^6.0.1",

@@ -4,8 +4,8 @@ import { Box, IconButton, Button, Typography } from "@mui/material";
 import PauseCircleFilledRoundedIcon from "@mui/icons-material/PauseCircleFilledRounded";
 import PlayCircleFilledRoundedIcon from "@mui/icons-material/PlayCircleFilledRounded";
 interface PlayerProps {
-  voice: string;
   length: number;
+  voice: string;
 }
 export default function Player({ voice, length }: PlayerProps) {
   const [wavesurfer, setWavesurfer] = useState<WaveSurfer>();
@@ -22,14 +22,13 @@ export default function Player({ voice, length }: PlayerProps) {
   };
 
   useEffect(() => {
-    const clocks = secondInClocks(playing ? duration :length );
+    const clocks = secondInClocks(playing ? duration : length);
     setTimer(
       `${Math.trunc(clocks.minutes) < 10 ? 0 : ""}${clocks.minutes}:${
         Math.trunc(clocks.seconds) < 10 ? 0 : ""
       }${Math.trunc(clocks.seconds)}`
     );
   }, [duration]);
-  
 
   useEffect(() => {
     let _wavesurfer = WaveSurfer.create({
@@ -46,7 +45,7 @@ export default function Player({ voice, length }: PlayerProps) {
       waveColor: "#35354c",
       cursorColor: "transparent",
       hideScrollbar: true,
-      barHeight:5
+      barHeight: 5,
     });
     _wavesurfer.load(voice);
     setWavesurfer(_wavesurfer);
@@ -86,7 +85,8 @@ export default function Player({ voice, length }: PlayerProps) {
 
   return (
     <Box
-      sx={{ width: {xs:"55vw" , md: '25vw'}, display: "flex" }}
+      // sx={{ width: { xs: "55vw", md: "25vw" }, display: "flex" }}
+      sx={{ width: '100%', display: "flex" }}
       gap="5px"
       display="flex"
       alignItems="center"
@@ -103,13 +103,18 @@ export default function Player({ voice, length }: PlayerProps) {
           <PlayCircleFilledRoundedIcon />
         )}
       </IconButton>
-      <Box sx={{ flex: 2, }} ref={el} />
+      <Box sx={{ flex: 2 }} ref={el} />
       <Typography color="text.disabled" variant="caption">
         {timer}
       </Typography>
       <Button
         onClick={toggleChangeSpeed}
-        sx={{ fontSize: 12, padding: 0, borderRadius: "15px",minWidth:'10px' }}
+        sx={{
+          fontSize: 12,
+          padding: 0,
+          borderRadius: "15px",
+          minWidth: "10px",
+        }}
       >
         {speedRate}X
       </Button>

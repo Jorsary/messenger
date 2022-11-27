@@ -102,7 +102,7 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
           sx={{
             display: "flex",
             ...(message.senderId === auth.currentUser?.uid && {
-              justifyContent: "end",
+              justifyContent: "end",width:'max-content'
             }),
           }}
         >
@@ -153,8 +153,9 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
         )}
 
         {message.voices && (
-
+          <Box sx={{ width: { xs: "55vw", md: "25vw" } }}>
             <Player voice={message.voices} length={message.duration ? message.duration : 0} />
+          </Box>
         )}
       </Card>
     </Box>

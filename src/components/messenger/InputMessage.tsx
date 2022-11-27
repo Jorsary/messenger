@@ -5,9 +5,9 @@ import KeyboardVoiceRoundedIcon from "@mui/icons-material/KeyboardVoiceRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import { Box, IconButton, Popover, TextField } from "@mui/material";
-import LinearProgress from "@mui/material/LinearProgress";
 import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import { ref as realRef, set } from "firebase/database";
+import LinearProgress from "@mui/material/LinearProgress";
 import {
   arrayUnion,
   doc,
@@ -27,6 +27,7 @@ import uuid from "react-uuid";
 import { auth, db, realdb, storage } from "../../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { handleOpenImagePopup } from "../../store/popupsSlice";
+import Player from "./WafeForm";
 
 const InputMessage = () => {
   const [text, setText] = useState("");
@@ -37,7 +38,6 @@ const InputMessage = () => {
   const [progress, setProgress] = useState<number>(0);
 
   const stopVoiceRef = useRef<HTMLButtonElement>(null);
-  const sendVoiseRef = useRef<HTMLButtonElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
 
   const open = Boolean(anchorEl);
@@ -61,6 +61,7 @@ const InputMessage = () => {
       }
     }
   };
+
   const onDeleteFile = () => {
     if (storageRefImg) {
       deleteObject(storageRefImg);
@@ -84,7 +85,7 @@ const InputMessage = () => {
           duration: duration ? duration : 0,
         }),
       });
-      
+
       await updateDoc(doc(db, "userChats", auth.currentUser.uid), {
         [chatId + ".lastMessage"]: {
           text: voices
@@ -112,7 +113,6 @@ const InputMessage = () => {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -126,57 +126,57 @@ const InputMessage = () => {
           mimeType: "audio/webm",
           audioBitsPerSecond: 128000,
         });
+        mediaRecorder.start();
         setOnRecord(true);
-        mediaRecorder.addEventListener("start", function (e: any) {});
         mediaRecorder.addEventListener(
           "dataavailable",
           function (e: BlobEvent) {
             if (e.data.size > 0) recordedChunks.push(e.data);
           }
         );
-        mediaRecorder.addEventListener("stop", async function () {
-          console.log(recordedChunks[0]);
-          const duration = recordedChunks[0].size / 16000;
-          const storageRef = ref(storage, `${uuid()}.webm`);
-          await uploadBytesResumable(
-            storageRef,
-            new File(recordedChunks, "", { type: "audio/webm" })
-          );
-          const downloadURL = await getDownloadURL(storageRef);
-          console.log(downloadURL);
-          handleSend(downloadURL, duration);
+        mediaRecorder.addEventListener("start", function time() {
+          console.log("f");
         });
-
-        if (sendVoiseRef && sendVoiseRef.current)
-          sendVoiseRef?.current?.addEventListener(
-            "click",
-            async function onSendClick() {
-              console.log(mediaRecorder);
-              mediaRecorder.stop();
-              this.removeEventListener("click", onSendClick);
-              setOnRecord(false);
-            }
-          );
-
+        mediaRecorder.addEventListener("stop", async function () {
+          const duration = recordedChunks[0].size / 16000;
+          setRecordingData({ data: recordedChunks[0], duration });
+        });
+        mediaRecorder.onstop = () => {};
         if (stopVoiceRef && stopVoiceRef.current)
           stopVoiceRef?.current?.addEventListener(
             "click",
             async function onStopClick() {
+              cancelAnimationFrame(1);
               mediaRecorder.stop();
               this.removeEventListener("click", onStopClick);
-              setOnRecord(false);
             }
           );
-
-        mediaRecorder.start();
-      });
+      }).catch(function(error) {
+        alert('Разрешите использовать микрофон');
+        console.error(error);
+    });
   }
+
+  const [recordingData, setRecordingData] = useState<any>();
+
+  const deleteRecording = () => {
+    setRecordingData(null);
+    setOnRecord(false);
+  };
 
   const handleWriting = (writeState: boolean) => {
     set(realRef(realdb, chatId + uid), {
       writing: writeState,
     });
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleWriting(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [text]);
 
   return (
     <>
@@ -293,9 +293,6 @@ const InputMessage = () => {
               }}
               value={text}
               size="small"
-              onBlur={() => {
-                handleWriting(false);
-              }}
               InputProps={{
                 style: { fontFamily: "sans-serif, Noto Color Emoji" },
                 disableUnderline: true,
@@ -322,31 +319,61 @@ const InputMessage = () => {
           </Box>
           {!text && !img && (
             <>
-              <IconButton
-                color="primary"
-                size="small"
-                ref={stopVoiceRef}
-                sx={{ display: onRecord ? "block" : "none" }}
-              >
-                <StopCircleIcon />
-              </IconButton>
-              <LinearProgress
-                sx={{
-                  flexGrow: 2,
-                  width: "16vw",
-                  display: onRecord ? "block" : "none",
-                }}
-                variant="indeterminate"
-                value={progress}
-              />
-              <IconButton
-                color="primary"
-                size="small"
-                ref={sendVoiseRef}
-                sx={{ display: onRecord ? "block" : "none" }}
-              >
-                <SendRoundedIcon />
-              </IconButton>
+              {recordingData ? (
+                <>
+                  <IconButton
+                    aria-label=""
+                    onClick={() => {
+                      deleteRecording();
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Player
+                    voice={URL.createObjectURL(recordingData.data)}
+                    length={recordingData.duration}
+                  />{" "}
+                  <IconButton
+                    color="primary"
+                    size="small"
+                    sx={{ display: onRecord ? "block" : "none" }}
+                    onClick={async () => {
+                      const storageRef = ref(storage, `${uuid()}.webm`);
+                      await uploadBytesResumable(
+                        storageRef,
+                        new File([recordingData.data], "", {
+                          type: "audio/webm",
+                        })
+                      );
+                      const downloadURL = await getDownloadURL(storageRef);
+                      deleteRecording();
+                      handleSend(downloadURL, recordingData.duration);
+                    }}
+                  >
+                    <SendRoundedIcon />
+                  </IconButton>
+                </>
+              ) : (
+                <>
+                  <LinearProgress
+                    sx={{
+                      flexGrow: 2,
+                      width: "16vw",
+                      display: onRecord ? "block" : "none",
+                    }}
+                    variant="indeterminate"
+                    value={progress}
+                  />
+                  <IconButton
+                    color="primary"
+                    size="small"
+                    ref={stopVoiceRef}
+                    sx={{ display: onRecord ? "block" : "none" }}
+                  >
+                    <StopCircleIcon />
+                  </IconButton>
+                </>
+              )}
 
               <IconButton
                 color="primary"
