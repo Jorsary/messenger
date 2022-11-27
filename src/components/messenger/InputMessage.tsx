@@ -121,11 +121,19 @@ const InputMessage = () => {
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then(function (stream) {
+        let options
+        if (MediaRecorder.isTypeSupported("video/webm; codecs=vp9")) {
+          options = { mimeType: "video/webm; codecs=vp9",audioBitsPerSecond: 128000, };
+        } else if (MediaRecorder.isTypeSupported("video/webm")) {
+          options = { mimeType: "video/webm",audioBitsPerSecond: 128000, };
+        } else if (MediaRecorder.isTypeSupported("video/mp4")) {
+          options = { mimeType: "video/mp4", audioBitsPerSecond: 128000 };
+        } else {
+          console.error("no suitable mimetype found for this device");
+        }
         const recordedChunks: any = [];
-        const mediaRecorder = new MediaRecorder(stream, {
-          mimeType: "audio/webm",
-          audioBitsPerSecond: 128000,
-        });
+        const mediaRecorder = new MediaRecorder(stream, options);
+
         mediaRecorder.start();
         setOnRecord(true);
         mediaRecorder.addEventListener(
@@ -151,10 +159,11 @@ const InputMessage = () => {
               this.removeEventListener("click", onStopClick);
             }
           );
-      }).catch(function(error) {
-        alert('Разрешите использовать микрофон');
+      })
+      .catch(function (error) {
+        alert("Разрешите использовать микрофон");
         console.error(error);
-    });
+      });
   }
 
   const [recordingData, setRecordingData] = useState<any>();
