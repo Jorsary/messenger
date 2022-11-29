@@ -10,7 +10,7 @@ import {
   onValue,
   ref as realRef,
   serverTimestamp,
-  set,
+  set,push
 } from "firebase/database";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -55,23 +55,33 @@ function App() {
   const [user, loading, error] = useAuthState(auth);
   const { loadingUser, uid } = useAppSelector((state) => state.user);
 
+  const statusRef = realRef(realdb, `state/${uid}`)
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(setLoading({ loading, error }));
     dispatch(setUserInfo({ ...user }));
   }, [user, loading, error]);
 
+
   useEffect(() => {
-    if (uid) {
-      console.log(uid)
-      set(realRef(realdb, `state/${uid}`), {
-        state: true,
-      });
-    }
+    const unsub = onValue(statusRef, (snapshot) => {
+      const data = snapshot.val();
+      if (uid && !data.state) {
+        set(statusRef, {
+          state: true,
+        });
+      }
+    });
+   
+    return () => {
+      unsub();
+    };
+    
   }, [uid]);
 
   if (uid) {
-    onDisconnect(realRef(realdb, `state/${uid}`)).set({
+    onDisconnect(statusRef).set({
       state: false,
       time: serverTimestamp(),
     });
