@@ -32,7 +32,6 @@ const chatSlice = createSlice({
       state.enemyUser = action.payload.u;
       state.chatId = action.payload.res;
       state.userPresence = action.payload.userPresence
-
     },
 
   },

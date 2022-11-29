@@ -174,7 +174,7 @@ const InputMessage = () => {
   };
 
   const handleWriting = (writeState: boolean) => {
-    set(realRef(realdb, chatId + uid), {
+    set(realRef(realdb, `write/${uid+enemyUser?.uid}`), {
       writing: writeState,
     });
   };

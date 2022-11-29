@@ -1,25 +1,27 @@
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Snackbar } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
 import Container from "@mui/material/Container";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import {
   ConfirmationResult,
   RecaptchaVerifier,
-  signInWithPhoneNumber
+  signInWithPhoneNumber,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/bootstrap.css";
 import { Navigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import { auth, db } from "../firebase/firebase";
 import { useAppSelector } from "../hooks/redux-hooks";
-
+import CircularProgress from "@mui/material/CircularProgress";
 interface IAuthForm {
   phone: string;
   password: string;
@@ -39,38 +41,47 @@ export default function SignIn() {
   const [number, setNumber] = useState("");
   const { loadingUser } = useAppSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<any>("");
+
+  const { darkMode } = useAppSelector((state) => state.theme);
 
   const {
     register,
     formState: { errors },
     handleSubmit,
     reset,
+    control,
   } = useForm<IAuthForm>({
     mode: "onSubmit",
   });
 
-  function generateRecaptcha(number: string) {
-    const recaptchaVerifier = new RecaptchaVerifier(
+  useEffect(() => {
+    window.recaptchaVerifier = new RecaptchaVerifier(
       "recaptcha-container",
       { size: "invisible" },
       auth
     );
-    recaptchaVerifier.render();
-    return signInWithPhoneNumber(auth, number, recaptchaVerifier);
-  }
+    window.recaptchaVerifier.render();
+  }, []);
 
   const onSubmit = async (data: IAuthForm) => {
+    console.log(data.phone);
     try {
-      setLoading(true)
-      const response = await generateRecaptcha(data.phone);
+      setLoading(true);
+      const response = await signInWithPhoneNumber(
+        auth,
+        `+${data.phone}`,
+        window.recaptchaVerifier
+      );
       setResult(response);
       setFlag(true);
       setNumber(data.phone);
-    } catch (err) {
+    } catch (err: any) {
+      setError(err);
       console.log(err);
     }
     reset();
-    setLoading(false)
+    setLoading(false);
   };
 
   const verifyOtp = async (data: IAuthForm) => {
@@ -84,10 +95,22 @@ export default function SignIn() {
         });
         await setDoc(doc(db, "userChats", res.user.uid), {});
       }
-    } catch (err) {
+    } catch (err: any) {
+      setError(err);
       console.log(err);
     }
     setLoading(false);
+  };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setError("");
   };
 
   if (auth.currentUser) {
@@ -124,38 +147,55 @@ export default function SignIn() {
               onSubmit(data);
             })}
             noValidate
-            sx={{ mt: 1 }}
+            sx={{ mt: 3 }}
           >
-            <TextField
-              error={!!errors.phone?.message}
-              margin="normal"
-              required
-              fullWidth
-              id="phone"
-              label="Номер телефона"
-              autoComplete="phone"
-              autoFocus
-              {...register("phone", {
-                required: "Поле не может быть пустым",
-                pattern: {
-                  value:
-                    /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im,
-                  message: "Некорректный номер телефона",
-                },
-              })}
+            <Controller
+              control={control}
+              name="phone"
+              rules={{
+                required: true,
+                // pattern: {
+                //   value:
+                //     /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im,
+                //   message: "Некорректный номер телефона",
+                // },
+              }}
+              render={({ field: { ref, ...field } }) => (
+                <PhoneInput
+                  {...field}
+                  inputProps={{
+                    ref,
+                    required: true,
+                    autoFocus: true,
+                  }}
+                  onEnterKeyPress={handleSubmit((data) => {
+                    onSubmit(data);
+                  })}
+                  country="ru"
+                  containerStyle={{ width: "100%" }}
+                  countryCodeEditable={true}
+                  specialLabel={"Player Mobile Number"}
+                  inputStyle={{
+                    backgroundColor: "transparent",
+                    color: darkMode ? "white" : "black",
+                    width: "100%",
+                  }}
+                  dropdownStyle={{
+                    backgroundColor: darkMode ? "black" : "white",
+                  }}
+                  buttonStyle={{
+                    color: "cyan",
+                  }}
+                />
+              )}
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Запомнить меня"
-            />
-
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              {loading ? <Loader/> : 'Войти'}
+              {loading ? <CircularProgress size={24} color="info" /> : "Войти"}
             </Button>
             <Box id="recaptcha"></Box>
           </Box>
@@ -167,7 +207,7 @@ export default function SignIn() {
               reset();
             })}
             noValidate
-            sx={{ mt: 1, textAlign: "center" }}
+            sx={{ mt: 1, textAlign: "center", maxWidth: 271 }}
           >
             На ваш телефон отправлен код
             <TextField
@@ -176,7 +216,7 @@ export default function SignIn() {
               required
               fullWidth
               id="otp"
-              label="6-значный код"
+              placeholder="6-значный код"
               autoComplete="otp"
               autoFocus
               {...register("otp", {
@@ -198,6 +238,11 @@ export default function SignIn() {
           </Box>
         )}
       </Box>
+      <Snackbar onClose={handleClose} open={!!error} autoHideDuration={5000}>
+        <MuiAlert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+          {error.message}
+        </MuiAlert>
+      </Snackbar>
     </Container>
   );
 }

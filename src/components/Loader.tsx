@@ -18,7 +18,7 @@ const Loader = ({height,width,loaded}:propType) => {
         width: width
       }}
     >
-      <CircularProgress color="secondary" />
+      <CircularProgress sx={{color:'secondary.dark'}} />
     </Box>
   );
 };

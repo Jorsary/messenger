@@ -23,6 +23,7 @@ const Chat = ({ id }: any) => {
   const { chatId, enemyUser, userPresence } = useAppSelector(
     (state) => state.chat
   );
+  const { uid } = useAppSelector((state) => state.user);
   const [messages, setMessages] = useState<Array<IMessage>>([]);
 
   const push = useNavigate();
@@ -33,7 +34,7 @@ const Chat = ({ id }: any) => {
   useEffect(() => {
     if (chatId && enemyUser) {
       const unsub = onValue(
-        realRef(realdb, chatId + enemyUser?.uid),
+        realRef(realdb, `write/${enemyUser?.uid + uid}`),
         (snapshot) => {
           const data: { writing: boolean } = snapshot.val();
           if (data) setWriting(data.writing);
@@ -59,12 +60,9 @@ const Chat = ({ id }: any) => {
   }, [chatId]);
 
   useEffect(() => {
-    if (userPresence.time) {
+    if (userPresence && userPresence.time) {
       const date = new Date(userPresence.time);
       setDate(date.toLocaleTimeString() + " " + date.toLocaleDateString());
-    }
-    if (userPresence.state) {
-      setDate("");
     }
   }, [userPresence]);
 
@@ -113,8 +111,10 @@ const Chat = ({ id }: any) => {
 
               <Typography>{enemyUser?.displayName}</Typography>
               <Typography
-                display={userPresence.state ? "none" : "block"}
                 variant="caption"
+                sx={{
+                  display: !userPresence.state ? "block" : "none",
+                }}
               >{`Был в сети ${date}`}</Typography>
             </Box>
           </Toolbar>

@@ -5,7 +5,7 @@ import { auth } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import { NavLinks } from "../../models";
 import Logo from "./Logo";
-import {memo} from 'react'
+import { memo } from "react";
 
 interface NavigationProps {
   links: NavLinks[];
@@ -23,7 +23,12 @@ const Navigation = ({ links }: NavigationProps) => {
         {links
           .filter((page) => !page.auth || displayName)
           .map((page) => (
-            <MenuItem key={page.title}>
+            <MenuItem
+              sx={{
+                borderRadius: "15px",
+              }}
+              key={page.title}
+            >
               <NavLink
                 color="#fffff"
                 style={{
@@ -49,7 +54,12 @@ const Navigation = ({ links }: NavigationProps) => {
         {links
           .filter((page) => !page.auth || displayName)
           .map((page) => (
-            <MenuItem key={page.title}>
+            <MenuItem
+              sx={{
+                borderRadius: "15px",
+              }}
+              key={page.title}
+            >
               <NavLink
                 color="#fffff"
                 style={{

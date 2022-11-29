@@ -36,7 +36,7 @@ const Messenger = () => {
 
   useEffect(() => {
     if (user && chatid) {
-      const unsub = onValue(realRef(realdb, user.uid), (snapshot) => {
+      const unsub = onValue(realRef(realdb, `state/${user.uid}`), (snapshot) => {
         const data = snapshot.val();
         setUserPresence(data)
         dispatch(changeUser({ res: chatid, u: user,userPresence:data }));

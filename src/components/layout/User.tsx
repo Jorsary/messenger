@@ -67,6 +67,7 @@ const User = ({ settings }: UserProps) => {
             <MenuItem
               key={setting.title}
               onClick={() => handleFollowToLink(setting.path)}
+              
             >
               <Typography
                 sx={{ display: "flex", alignItems: "center" }}
@@ -84,6 +85,9 @@ const User = ({ settings }: UserProps) => {
       >
         {settings.map((setting) => (
           <MenuItem
+            sx={{
+              borderRadius:'15px'
+            }}
             key={setting.title}
             onClick={() => handleFollowToLink(setting.path)}
           >

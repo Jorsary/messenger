@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import {
   onDisconnect,
+  onValue,
   ref as realRef,
   serverTimestamp,
   set,
@@ -14,11 +15,11 @@ import {
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDispatch } from "react-redux";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import ImagePopup from "./components/messenger/ImagePopup";
 import PrivateOutlet from "./components/PrivateOutlet";
-import { auth, realdb } from "./firebase/firebase";
+import { auth, db, realdb } from "./firebase/firebase";
 import { useAppSelector } from "./hooks/redux-hooks";
 import Logout from "./pages/Logout";
 import Messenger from "./pages/Messenger";
@@ -62,13 +63,15 @@ function App() {
 
   useEffect(() => {
     if (uid) {
-      set(realRef(realdb, uid), {
+      console.log(uid)
+      set(realRef(realdb, `state/${uid}`), {
         state: true,
       });
     }
   }, [uid]);
+
   if (uid) {
-    onDisconnect(realRef(realdb, uid)).set({
+    onDisconnect(realRef(realdb, `state/${uid}`)).set({
       state: false,
       time: serverTimestamp(),
     });

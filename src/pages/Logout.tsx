@@ -9,7 +9,7 @@ const Logout = () => {
 
   signOut(auth);
   dispatch(removeUser);
-  dispatch(changeUser({ u: null, res: "" }));
+  dispatch(changeUser({ u: null, res: ""}));
   return <></>;
 };
 

@@ -58,11 +58,14 @@ const Header = () => {
               margin: "0 auto",
               justifyContent: "space-between",
               width: "100%",
+              gap:1
             }}
           >
             <Navigation links={links} />
             <User settings={settings} />
-            <MenuItem onClick={() => dispatch(setTheme())}>
+            <MenuItem sx={{
+              borderRadius:'15px'
+            }} onClick={() => dispatch(setTheme())}>
               <Brightness4RoundedIcon></Brightness4RoundedIcon>
             </MenuItem>
           </Box>

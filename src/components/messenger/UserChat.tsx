@@ -1,7 +1,7 @@
 import { Avatar, Box, Card, Typography } from "@mui/material";
 import { onValue, ref as realRef } from "firebase/database";
 import { DocumentReference, getDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState,memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, realdb } from "../../firebase/firebase";
 import { useAppDispatch } from "../../hooks/redux-hooks";
@@ -46,7 +46,7 @@ const UserChat = ({ info }: UserInfo) => {
   useEffect(() => {
     getUserInfo();
     if (info.userInfo.uid) {
-      const unsub = onValue(realRef(realdb, info.userInfo.uid), (snapshot) => {
+      const unsub = onValue(realRef(realdb, `state/${info.userInfo.uid}`), (snapshot) => {
         const data = snapshot.val();
         setUserPresence(data);
       });
@@ -110,4 +110,4 @@ const UserChat = ({ info }: UserInfo) => {
   );
 };
 
-export default UserChat;
+export default memo(UserChat);
