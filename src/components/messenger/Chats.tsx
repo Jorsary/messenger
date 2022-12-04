@@ -15,7 +15,6 @@ import UserChat, { UserInfo } from "./UserChat";
 const Chats = ({ id }: any) => {
   const [chats, setChats] = useState<DocumentData>();
   const { uid } = useAppSelector((state) => state.user);
-
   useEffect(() => {
     if (uid) {
       const getChats = () => {

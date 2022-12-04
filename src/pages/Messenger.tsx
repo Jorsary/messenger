@@ -1,13 +1,14 @@
+import { onValue, ref as realRef } from "firebase/database";
 import { doc, getDoc } from "firebase/firestore";
+import { onMessage } from "firebase/messaging";
 import { memo, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Wrapper from "../components/layout/Wrapper";
 import Chat from "../components/messenger/Chat";
 import Chats from "../components/messenger/Chats";
-import { db, realdb } from "../firebase/firebase";
+import { db, messaging, realdb } from "../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
 import { changeUser } from "../store/chatSlice";
-import { onValue, ref as realRef } from "firebase/database";
 
 const Messenger = () => {
   const { chatid } = useParams();
@@ -15,9 +16,9 @@ const Messenger = () => {
   const { uid } = useAppSelector((state) => state.user);
   const [user, setUser] = useState<any>();
   const [userPresence, setUserPresence] = useState<any>();
-  
-  if(!chatid){
-    dispatch(changeUser({ res: '', u: null, userPresence:{} })); 
+
+  if (!chatid) {
+    dispatch(changeUser({ res: "", u: null, userPresence: {} }));
   }
 
   useEffect(() => {
@@ -34,18 +35,24 @@ const Messenger = () => {
     }
   }, [chatid]);
 
+  onMessage(messaging, (payload) => {
+    console.log("Message received. ", payload);
+  });
+
   useEffect(() => {
     if (user && chatid) {
-      const unsub = onValue(realRef(realdb, `state/${user.uid}`), (snapshot) => {
-        const data = snapshot.val();
-        setUserPresence(data)
-        dispatch(changeUser({ res: chatid, u: user,userPresence:data }));
-      });
+      const unsub = onValue(
+        realRef(realdb, `state/${user.uid}`),
+        (snapshot) => {
+          const data = snapshot.val();
+          setUserPresence(data);
+          dispatch(changeUser({ res: chatid, u: user, userPresence: data }));
+        }
+      );
       return () => {
         unsub();
       };
     }
-   
   }, [user]);
 
   return (

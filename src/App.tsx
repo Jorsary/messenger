@@ -5,21 +5,23 @@ import {
   CssBaseline,
   ThemeProvider,
 } from "@mui/material";
+import { browserSessionPersistence, setPersistence } from "firebase/auth";
 import {
   onDisconnect,
   onValue,
   ref as realRef,
   serverTimestamp,
-  set,push
+  set,
 } from "firebase/database";
+import { getToken } from "firebase/messaging";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDispatch } from "react-redux";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import ImagePopup from "./components/messenger/ImagePopup";
 import PrivateOutlet from "./components/PrivateOutlet";
-import { auth, db, realdb } from "./firebase/firebase";
+import { auth, messaging, realdb } from "./firebase/firebase";
 import { useAppSelector } from "./hooks/redux-hooks";
 import Logout from "./pages/Logout";
 import Messenger from "./pages/Messenger";
@@ -28,7 +30,6 @@ import Profile from "./pages/Profile";
 import UserSettings from "./pages/ProfileSettings";
 import SignIn from "./pages/SignIn";
 import { setLoading, setUserInfo } from "./store/userSlice";
-
 export const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -55,14 +56,13 @@ function App() {
   const [user, loading, error] = useAuthState(auth);
   const { loadingUser, uid } = useAppSelector((state) => state.user);
 
-  const statusRef = realRef(realdb, `state/${uid}`)
+  const statusRef = realRef(realdb, `state/${uid}`);
 
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(setLoading({ loading, error }));
     dispatch(setUserInfo({ ...user }));
   }, [user, loading, error]);
-
 
   useEffect(() => {
     const unsub = onValue(statusRef, (snapshot) => {
@@ -73,11 +73,10 @@ function App() {
         });
       }
     });
-   
+
     return () => {
       unsub();
     };
-    
   }, [uid]);
 
   if (uid) {
@@ -86,7 +85,27 @@ function App() {
       time: serverTimestamp(),
     });
   }
+  async function requestPermission() {
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      const token = await getToken(messaging, {
+        vapidKey:
+          "BMWmZeXrlYaQdyenZ_cHS01gKOG-q-wecj7R-cer91TrQEm1e9pWzgFQuHQ4LwVxlkAzsfaW0t6G3KzPNGukH30",
+      })
+        .then((token) => {
+          console.log(token);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else if (permission === "denied") {
+      alert("You denied for the notification");
+    }
+  }
 
+  useEffect(() => {
+    requestPermission();
+  }, []);
   return (
     <ThemeProvider theme={darkMode ? darkTheme : ligthTheme}>
       <CssBaseline />

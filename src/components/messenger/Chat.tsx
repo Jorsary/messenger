@@ -36,6 +36,7 @@ const Chat = ({ id }: any) => {
       const unsub = onValue(
         realRef(realdb, `write/${enemyUser?.uid + uid}`),
         (snapshot) => {
+
           const data: { writing: boolean } = snapshot.val();
           if (data) setWriting(data.writing);
         }
