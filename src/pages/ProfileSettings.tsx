@@ -4,7 +4,7 @@ import {
   Grid,
   Popover,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { updateProfile } from "firebase/auth";
@@ -12,13 +12,11 @@ import { doc, updateDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Wrapper from "../components/layout/Wrapper";
-import Loader from "../components/Loader";
 import Modal from "../components/Modal";
 import { auth, db } from "../firebase/firebase";
 import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
 import { setLoading, setUserInfo } from "../store/userSlice";
 import stringToColor from "../utlis/stringToColor";
-import ModeIcon from "@mui/icons-material/Mode";
 
 interface ISettingsForm {
   nickname: string;
@@ -87,7 +85,18 @@ const UserSettings = () => {
               backgroundSize: "contain",
               width: "50vw",
               height: "50vw",
-              display: displayName ? 'flex' : 'none'
+              display: displayName ? 'flex' : 'none',
+              '&:hover::before': {
+                position: 'absolute',
+                content: "''",
+                width: '100%',
+                height: "100%",
+                backgroundImage: 'url(https://cdn-icons-png.flaticon.com/128/990/990105.png)',
+                backgroundSize: '26px',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: '50%',
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              }
             }}
             srcSet={`${photoURL}`}
           />

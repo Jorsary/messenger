@@ -45,7 +45,7 @@ const Chat = ({ id }: any) => {
         unsub();
       };
     }
-  }, [enemyUser]);
+  }, [enemyUser, chatId, uid]);
 
   useEffect(() => {
     try {
@@ -106,7 +106,6 @@ const Chat = ({ id }: any) => {
                 <Avatar
                   sx={{ bgcolor: stringToColor(`${enemyUser?.displayName}`) }}
                   src={`${enemyUser?.photoURL}`}
-                  alt={`${enemyUser?.displayName}`}
                 />
               </StyledBadge>
 

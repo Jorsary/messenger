@@ -1,4 +1,4 @@
-import { Avatar, Box, TextField, Typography,Card } from "@mui/material";
+import { Avatar, Box, TextField, Typography, Card, IconButton } from "@mui/material";
 import { UserInfo } from "firebase/auth";
 import {
   collection,
@@ -12,33 +12,45 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { auth, db } from "../../firebase/firebase";
+import stringToColor from "../../utlis/stringToColor";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Search = () => {
   const [userAName, setUserAName] = useState("");
-  const [userAnother, setUserAnother] = useState<UserInfo[]>([]);
+  const [foundedUsers, setFoundedUsers] = useState<UserInfo[]>([]);
   const [err, setErr] = useState(false);
 
   const handleSearch = async () => {
-    setUserAnother([]);
+    setFoundedUsers([]);
     const q = query(
       collection(db, "users"),
       where("displayName", ">=", userAName),
       where("displayName", "<=", userAName + "~"),
-      limit(3)
     );
 
     try {
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         const userdata = doc.data();
-        setUserAnother((prev: any) => [...prev, userdata]);
+        setFoundedUsers((prev: any) => [...prev, userdata]);
       });
     } catch (err) {
       setErr(true);
     }
   };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (userAName !== '') {
+        handleSearch();
+      }
+    }, 500);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [userAName]);
 
   const handleSelect = async (user: UserInfo) => {
     if (auth.currentUser) {
@@ -69,8 +81,8 @@ const Search = () => {
             [combinedId + ".date"]: serverTimestamp(),
           });
         }
-      } catch (err) {}
-      setUserAnother([]);
+      } catch (err) { }
+      setFoundedUsers([]);
       setUserAName("");
     }
   };
@@ -81,6 +93,7 @@ const Search = () => {
         e.preventDefault();
         handleSearch();
       }}
+      onReset={() => { setFoundedUsers([]) }}
     >
       <TextField
         fullWidth
@@ -90,31 +103,41 @@ const Search = () => {
         onChange={(e: any) => {
           setUserAName(e.target.value);
         }}
-      />
-      {userAnother.map((user: UserInfo) => (
-        <Card
-          onClick={()=>handleSelect(user)}
-          sx={{
-            boxSizing: "border-box",
-            minHeight: 64,
-            px: 2,
-            py: 1,
-            display: user || err ? "flex" : "none",
-            alignItems: "center",
-            gap: 1,
-            cursor: "pointer",
-            boxShadow: 0,
-            transition: "all .2s ease-in-out",
-            "&:hover": {
-              transform: "translateY(-1px)",
-              boxShadow: 6,
-            },
-          }}
-        >
-          <Avatar src={user.photoURL || ''} alt="" />
-          <Typography>{user?.displayName}</Typography>
-        </Card>
-      ))}
+        InputProps={{ endAdornment: <IconButton sx={{ padding: 0 }} type='reset'><CloseIcon fontSize="small" /></IconButton> }}
+      ></TextField>
+      <Box>
+        <Typography display={foundedUsers.length ? 'block' : 'none'} sx={{ fontSize: '10px' }}>{`Найдено ${foundedUsers.length} пользователя`}</Typography>
+        <Typography display={(foundedUsers.length < 1 && userAName) ? 'block' : 'none'} sx={{ fontSize: '10px' }}>{`Ничего не найдено`}</Typography>
+        {foundedUsers.map((user: UserInfo) => (
+          <Card
+            onClick={() => handleSelect(user)}
+            sx={{
+              boxSizing: "border-box",
+              minHeight: 64,
+              px: 2,
+              py: 1,
+              display: user || err ? "flex" : "none",
+              alignItems: "center",
+              gap: 1,
+              cursor: "pointer",
+              boxShadow: 0,
+              transition: "all .2s ease-in-out",
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: 6,
+              },
+            }}
+          >
+            <Avatar sx={{
+              bgcolor: stringToColor(`${user.displayName || ''}`),
+            }}
+              src={user.photoURL || ''} />
+            <Typography>{user?.displayName}</Typography>
+            <Typography sx={{justifySelf:'self-end'}}variant="caption">Добавить чат</Typography>
+          </Card>
+        ))}
+      </Box>
+
     </Box>
   );
 };

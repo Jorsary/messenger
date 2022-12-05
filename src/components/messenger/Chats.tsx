@@ -1,16 +1,14 @@
-import { Box, Skeleton } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   doc,
-  DocumentData,
-  DocumentReference,
-  onSnapshot,
+  DocumentData, onSnapshot
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
 import Loader from "../Loader";
 import Search from "./Search";
-import UserChat, { UserInfo } from "./UserChat";
+import UserChat from "./UserChat";
 
 const Chats = ({ id }: any) => {
   const [chats, setChats] = useState<DocumentData>();
@@ -44,13 +42,15 @@ const Chats = ({ id }: any) => {
       }}
     >
       <Search />
+
       {chats ? (
         Object.entries(chats)
           ?.sort((a: any, b: any) => b[1].date - a[1].date)
           .map((chat: any) => <UserChat key={chat[0]} info={chat[1]} />)
       ) : (
-          <Loader />
+        <Loader />
       )}
+
     </Box>
   );
 };

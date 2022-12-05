@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/redux-hooks";
 import { handleOpenImagePopup } from "../store/popupsSlice";
 import stringToColor from "../utlis/stringToColor";
 
+
 const Profile = () => {
   const { displayName, photoURL } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
@@ -30,15 +31,14 @@ const Profile = () => {
             sx={{
               maxWidth: 250,
               maxHeight: 250,
-              background: !photoURL
-                ? stringToColor(`${displayName}`)
-                : `url(${photoURL})`,
+              background:
+                stringToColor(`${displayName}`)
+              ,
               backgroundSize: "contain",
               width: "50vw",
               height: "50vw",
             }}
-            alt={`${displayName}`}
-            srcSet={`${photoURL}`}
+            src={`${photoURL}`}
           />
           <Typography
             sx={{

@@ -3,15 +3,14 @@ import {
   CircularProgress,
   createTheme,
   CssBaseline,
-  ThemeProvider,
+  ThemeProvider
 } from "@mui/material";
-import { browserSessionPersistence, setPersistence } from "firebase/auth";
 import {
   onDisconnect,
   onValue,
   ref as realRef,
   serverTimestamp,
-  set,
+  set
 } from "firebase/database";
 import { getToken } from "firebase/messaging";
 import { useEffect } from "react";

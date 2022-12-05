@@ -1,7 +1,7 @@
 import { Avatar, Box, Card, Typography } from "@mui/material";
 import { onValue, ref as realRef } from "firebase/database";
 import { DocumentReference, getDoc } from "firebase/firestore";
-import { useEffect, useState,memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, realdb } from "../../firebase/firebase";
 import { useAppDispatch } from "../../hooks/redux-hooks";
@@ -86,7 +86,6 @@ const UserChat = ({ info }: UserInfo) => {
             bgcolor: stringToColor(`${userInfo.displayName}`),
           }}
           src={`${userInfo.photoURL}`}
-          alt={userInfo.displayName}
         />
       </StyledBadge>
 

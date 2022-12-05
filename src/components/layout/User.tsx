@@ -4,7 +4,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/system";
-import React, { useState,memo } from "react";
+import React, { useState, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/firebase";
 import { useAppSelector } from "../../hooks/redux-hooks";
@@ -44,7 +44,7 @@ const User = ({ settings }: UserProps) => {
         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, gap: 1 }}>
           <Avatar
             src={`${photoURL}`}
-            sx={{ bgcolor: stringToColor(`${displayName}`)}}
+            sx={{ bgcolor: stringToColor(`${displayName}`) }}
           />
         </IconButton>
         <Menu
@@ -67,7 +67,7 @@ const User = ({ settings }: UserProps) => {
             <MenuItem
               key={setting.title}
               onClick={() => handleFollowToLink(setting.path)}
-              
+
             >
               <Typography
                 sx={{ display: "flex", alignItems: "center" }}
@@ -86,7 +86,7 @@ const User = ({ settings }: UserProps) => {
         {settings.map((setting) => (
           <MenuItem
             sx={{
-              borderRadius:'15px'
+              borderRadius: '15px'
             }}
             key={setting.title}
             onClick={() => handleFollowToLink(setting.path)}
