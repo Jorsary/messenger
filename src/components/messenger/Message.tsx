@@ -29,7 +29,7 @@ export interface IMessage {
 const Message = ({ message, enemyUser }: InfoMessage) => {
   const [loaded, setLoaded] = useState(false);
 
-  
+
   const senderUser = message.senderId === enemyUser?.uid;
   const chatRef = useRef<HTMLDivElement | null>(null);
 
@@ -40,6 +40,28 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
       chatRef.current.scrollIntoView();
     }
   }, [message]);
+
+
+  const [fileType, setFileType] = useState('')
+  const videoRef = useRef<HTMLSourceElement>(null)
+  useEffect(() => {
+
+    const fetchData = async () => {
+      if (message.img) {
+        fetch(message.img).then((res => res.blob())).then((data) => {
+          setFileType(data.type);
+          if (data.type.includes('video')) {
+            const file = new Blob([data])
+            setLoaded(true)
+            if (videoRef.current) { videoRef.current.src = URL.createObjectURL(file) }
+          }
+        })
+      }
+    }
+    fetchData()
+  }, [message])
+
+
 
 
 
@@ -95,14 +117,14 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
           flexDirection: "column",
           padding: { xs: 1, md: "11px" },
           gap: 1,
-          width:'max-content'
+          width: 'max-content'
         }}
       >
         <Box
           sx={{
             display: "flex",
             ...(message.senderId === auth.currentUser?.uid && {
-              justifyContent: "end",width:'max-content'
+              justifyContent: "end", width: 'max-content'
             }),
           }}
         >
@@ -133,17 +155,18 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
             {message.text}
           </Typography>
         )}
-        {message.img && (
+        {fileType.includes('image') && (
           <>
             <img
+              alt="картинка"
               onClick={() => {
                 {
                   message.img &&
                     dispatch(handleOpenImagePopup({ imageLink: message.img }));
                 }
               }}
-              style={{ display: loaded ? "block" : "none",maxWidth:400 }}
               src={message.img}
+              style={{ display: loaded ? "block" : "none", maxWidth: 400 }}
               onLoad={() => {
                 setLoaded(true);
               }}

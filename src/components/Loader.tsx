@@ -11,7 +11,7 @@ const Loader = ({height,width,loaded}:propType) => {
   return (
     <Box
       sx={{
-        display: loaded ? 'none' : 'flex',
+        display: loaded ? 'flex' : 'none',
         alignItems: "center",
         justifyContent: "center",
         height: height ? height : '100%',
