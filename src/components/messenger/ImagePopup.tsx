@@ -16,7 +16,7 @@ function ImagePopup() {
       }}
     >
       <Card>
-        <img style={{ width: "60vw", maxWidth: 600 }} src={imageLink} />
+        <img alt={'картинка'} style={{ maxHeight: '90vh', maxWidth: '90vw', objectFit: 'contain' }} src={imageLink} />
         <CloseIcon
           fontSize={"large"}
           sx={{

@@ -27,7 +27,7 @@ export interface IMessage {
 }
 
 const Message = ({ message, enemyUser }: InfoMessage) => {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
 
 
   const senderUser = message.senderId === enemyUser?.uid;
@@ -52,7 +52,7 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
           setFileType(data.type);
           if (data.type.includes('video')) {
             const file = new Blob([data])
-            setLoaded(true)
+            setLoaded(false)
             if (videoRef.current) { videoRef.current.src = URL.createObjectURL(file) }
           }
         })
@@ -155,22 +155,26 @@ const Message = ({ message, enemyUser }: InfoMessage) => {
             {message.text}
           </Typography>
         )}
-        {fileType.includes('image') && (
+        {message.img && (
           <>
-            <img
+            {fileType.includes('image') && (<img
               alt="картинка"
               onClick={() => {
-                {
-                  message.img &&
-                    dispatch(handleOpenImagePopup({ imageLink: message.img }));
-                }
-              }}
+                dispatch(handleOpenImagePopup({ imageLink: message.img ?  message.img : '' }));
+              }
+              }
               src={message.img}
-              style={{ display: loaded ? "block" : "none", maxWidth: 400 }}
+              style={{ display: loaded ? "none" : "block", maxHeight: '50vh', maxWidth: '50vw', objectFit: 'contain' }}
               onLoad={() => {
-                setLoaded(true);
+                setLoaded(false);
               }}
-            />
+
+            />)}
+            {fileType.includes('video') && (
+              <video style={{ maxHeight: '60vh' }} controls>
+                <source src={message.img} />
+              </video>
+            )}
             <Loader height="600px" width="400px" loaded={loaded} />
           </>
         )}

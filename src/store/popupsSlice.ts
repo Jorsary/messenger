@@ -1,9 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface PopupState {
+  imageIsOpen: boolean;
+  imageLink: string;
+}
+interface IPropPopup {
   imageIsOpen?: boolean;
   imageLink: string;
 }
-const initialState = {
+const initialState : PopupState = {
   imageIsOpen: false,
   imageLink: '',
 };
@@ -12,7 +16,7 @@ const popupsSlice = createSlice({
   name: "popups",
   initialState,
   reducers: {
-    handleOpenImagePopup(state,action:PayloadAction<PopupState>){
+    handleOpenImagePopup(state,action:PayloadAction<IPropPopup>){
       state.imageIsOpen=true
       state.imageLink=action.payload.imageLink
     },

@@ -32,6 +32,7 @@ import Player from "./WafeForm";
 const InputMessage = () => {
   const [text, setText] = useState("");
   const [img, setImg] = useState<string>("");
+  const [typeFile, setTypeFile] = useState<string>("");
   const [onRecord, setOnRecord] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [storageRefImg, setStorageRefImg] = useState<StorageReference>();
@@ -53,6 +54,7 @@ const InputMessage = () => {
     if (auth.currentUser && e.target.files) {
       const storageRef = ref(storage, uuid());
       await uploadBytesResumable(storageRef, e.target.files[0]);
+      setTypeFile(e.target.files[0].type)
       const downloadURL = await getDownloadURL(storageRef);
       setImg(downloadURL);
       setStorageRefImg(storageRef);
@@ -91,8 +93,8 @@ const InputMessage = () => {
           text: voices
             ? "Голосовое сообщение"
             : textMessage
-            ? textMessage
-            : "Изображение",
+              ? textMessage
+              : "Изображение",
         },
         [chatId + ".date"]: serverTimestamp(),
       });
@@ -102,8 +104,8 @@ const InputMessage = () => {
           text: voices
             ? "Голосовое сообщение"
             : textMessage
-            ? textMessage
-            : "Изображение",
+              ? textMessage
+              : "Изображение",
         },
         [chatId + ".date"]: serverTimestamp(),
       });
@@ -123,9 +125,9 @@ const InputMessage = () => {
       .then(function (stream) {
         let options
         if (MediaRecorder.isTypeSupported("video/webm; codecs=vp9")) {
-          options = { mimeType: "video/webm; codecs=vp9",audioBitsPerSecond: 128000, };
+          options = { mimeType: "video/webm; codecs=vp9", audioBitsPerSecond: 128000, };
         } else if (MediaRecorder.isTypeSupported("video/webm")) {
-          options = { mimeType: "video/webm",audioBitsPerSecond: 128000, };
+          options = { mimeType: "video/webm", audioBitsPerSecond: 128000, };
         } else if (MediaRecorder.isTypeSupported("video/mp4")) {
           options = { mimeType: "video/mp4", audioBitsPerSecond: 128000 };
         } else {
@@ -149,7 +151,7 @@ const InputMessage = () => {
           const duration = recordedChunks[0].size / 16000;
           setRecordingData({ data: recordedChunks[0], duration });
         });
-        mediaRecorder.onstop = () => {};
+        mediaRecorder.onstop = () => { };
         if (stopVoiceRef && stopVoiceRef.current)
           stopVoiceRef?.current?.addEventListener(
             "click",
@@ -174,7 +176,7 @@ const InputMessage = () => {
   };
 
   const handleWriting = (writeState: boolean) => {
-    set(realRef(realdb, `write/${uid+enemyUser?.uid}`), {
+    set(realRef(realdb, `write/${uid + enemyUser?.uid}`), {
       writing: writeState,
     });
   };
@@ -235,13 +237,19 @@ const InputMessage = () => {
               position: "relative",
             }}
           >
-            <img
+            {typeFile.includes('image') && <img
               onClick={() => {
                 dispatch(handleOpenImagePopup({ imageLink: img }));
               }}
               style={{ width: "10vh" }}
               src={img}
-            ></img>
+              alt='предпоказ загруженной картинки'
+            />}
+            {typeFile.includes('video') &&
+              <video preload="none" style={{ maxHeight: '60vh' }} controls>
+                <source src={img} />
+              </video>
+            }
             <CloseIcon
               onClick={() => onDeleteFile()}
               sx={{
